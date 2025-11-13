@@ -1,326 +1,96 @@
-/* =====================================================
-   GLOBAL VARIABLES – DARK & LIGHT THEME
-===================================================== */
+/* -------------------------------------------------------
+   Kharcha Tracker - styles.css (final)
+   Dark + Light theme, all text uses variables.
+--------------------------------------------------------- */
 
-:root {
+:root{
   --bg-1: #050505;
   --bg-2: #141414;
+  --card: rgba(255,255,255,0.04);
 
   --text: #ffffff;
   --muted: #bfbfbf;
 
-  --card: rgba(255,255,255,0.04);
-
   --accent: #ffd857;
-  --accent-dark: #e6c548;
-
   --danger: #ff5b5b;
   --success: #30d158;
 }
 
-[data-theme="light"] {
+[data-theme="light"]{
   --bg-1: #f5f7fb;
   --bg-2: #ffffff;
+  --card: #ffffff;
 
   --text: #111111;
   --muted: #555555;
-
-  --card: #ffffff;
 }
 
-/* =====================================================
-   GLOBAL STYLES
-===================================================== */
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: "Poppins", sans-serif;
-  background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
-  color: var(--text);
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:"Poppins",sans-serif;
+  background: linear-gradient(180deg,var(--bg-1),var(--bg-2));
+  color:var(--text); -webkit-font-smoothing:antialiased;
 }
+.wrap{max-width:1100px;margin:28px auto;padding:20px}
 
-* { box-sizing: border-box; }
+/* HEADER */
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.brand{display:flex;align-items:center;gap:14px}
+.logo-image{width:68px;height:68px;border-radius:14px;object-fit:cover}
+.title-main{margin:0;font-size:28px;color:var(--text)}
+.title-sub{margin:6px 0 0 0;color:var(--muted);font-size:13px}
+.controls{display:flex;gap:10px}
+.btn-small{padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.06);border:none;color:var(--text);cursor:pointer;font-weight:600}
 
-.wrap {
-  max-width: 1100px;
-  margin: 28px auto;
-  padding: 20px;
+/* GRID */
+.grid{display:grid;grid-template-columns:1fr 350px;gap:20px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+/* CARD */
+.card{background:var(--card);padding:18px;border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,0.45);margin-bottom:20px}
+.card h2{margin:0 0 12px 0;font-size:18px;color:var(--text)}
+
+/* FORM */
+.form-row{display:flex;gap:12px;align-items:center}
+.input{flex:1;background:rgba(255,255,255,0.06);border:none;padding:12px 14px;border-radius:10px;color:var(--text)}
+.input-narrow{width:140px;flex:0 0 140px}
+.hidden{display:none}
+
+/* BUTTONS */
+.btn-primary{width:100%;padding:12px;border-radius:12px;background:var(--accent);border:none;color:#111;font-weight:700;cursor:pointer}
+.btn-set{padding:12px 14px;border-radius:10px;background:var(--accent);border:none;color:#111;font-weight:700;cursor:pointer}
+.btn-ghost{padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.06);border:none;color:var(--text);cursor:pointer}
+
+/* SUMMARY */
+.summary-row{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;flex-wrap:wrap}
+.muted{color:var(--muted)}
+.big-number{font-size:28px;font-weight:800;color:var(--text)}
+.top3-list{display:flex;flex-direction:column;gap:6px}
+
+/* EXPENSE LIST */
+.expense-item{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.05);padding:12px;border-radius:12px;margin-bottom:10px}
+.expense-left{display:flex;align-items:center;gap:10px}
+.chip{width:12px;height:12px;border-radius:4px}
+.red{background:var(--danger)}.green{background:var(--success)}
+.bifurcation{display:flex;gap:20px;flex-wrap:wrap}
+.bif-info{display:flex;flex-direction:column;gap:10px}
+.bif-row{display:flex;justify-content:space-between;padding:10px;background:rgba(255,255,255,0.04);border-radius:10px}
+.bif-label{display:flex;align-items:center;gap:10px}
+.bif-value{font-weight:700;color:var(--text)}
+
+/* BANNER */
+.banner-neutral{padding:12px;border-radius:10px;background:rgba(255,255,255,0.02)}
+.banner-warning{padding:12px;border-radius:10px;background:#fff3c9;color:#4b3a00;font-weight:700}
+.banner-advice{padding:12px;border-radius:10px;background:#def6e4;color:#113820;font-weight:700}
+.banner-main{font-weight:700;margin-bottom:6px}
+.banner-sub{font-size:14px;color:var(--muted)}
+
+/* CATEGORY SUMMARY */
+.category-summary-item{display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text)}
+
+/* RESPONSIVE tweaks */
+@media(max-width:640px){
+  .input-narrow{width:100%;flex:1}
+  .form-row{flex-direction:column;align-items:stretch}
+  .grid{grid-template-columns:1fr}
 }
-
-/* =====================================================
-   HEADER
-===================================================== */
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.logo-image {
-  width: 68px;
-  height: 68px;
-  border-radius: 14px;
-  object-fit: cover;
-}
-
-.title h1 {
-  margin: 0;
-  font-size: 28px;
-  color: var(--text);
-}
-
-.title p {
-  margin: 6px 0 0 0;
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.controls {
-  display: flex;
-  gap: 12px;
-}
-
-.btn-small {
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.09);
-  border: none;
-  color: var(--text);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* =====================================================
-   GRID LAYOUT
-===================================================== */
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 350px;
-  gap: 20px;
-}
-
-@media (max-width: 900px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* =====================================================
-   CARD
-===================================================== */
-
-.card {
-  background: var(--card);
-  padding: 18px;
-  border-radius: 16px;
-  box-shadow: 0 8px 28px rgba(0,0,0,0.4);
-  margin-bottom: 20px;
-}
-
-.card h2 {
-  margin: 0 0 12px 0;
-  font-size: 18px;
-  color: var(--text);
-}
-
-/* =====================================================
-   INPUTS & BUTTONS
-===================================================== */
-
-.input,
-select,
-input {
-  width: 100%;
-  background: rgba(255,255,255,0.06);
-  border: none;
-  padding: 12px 14px;
-  border-radius: 10px;
-  color: var(--text);
-  font-size: 14px;
-}
-
-.row {
-  display: flex;
-  gap: 12px;
-}
-
-.row.three input,
-.row.three select {
-  flex: 1;
-}
-
-.btn-primary {
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: none;
-  background: var(--accent);
-  color: #111;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.btn-set {
-  padding: 12px 14px;
-  background: var(--accent);
-  border: none;
-  border-radius: 10px;
-  color: #111;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.btn-ghost {
-  padding: 8px 12px;
-  background: rgba(255,255,255,0.08);
-  border: none;
-  border-radius: 10px;
-  color: var(--text);
-  cursor: pointer;
-}
-
-/* =====================================================
-   SUMMARY + TOP 3
-===================================================== */
-
-.big-number {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.muted {
-  color: var(--muted);
-}
-
-.top3-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* =====================================================
-   EXPENSE LIST
-===================================================== */
-
-.expense-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(255,255,255,0.06);
-  padding: 12px;
-  border-radius: 12px;
-  margin-bottom: 10px;
-}
-
-.expense-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.chip {
-  width: 12px;
-  height: 12px;
-  border-radius: 4px;
-}
-
-.red { background: var(--danger); }
-.green { background: var(--success); }
-
-/* =====================================================
-   WALLET TRACKER
-===================================================== */
-
-.wallet-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.wallet-input {
-  flex: 1;
-  background: rgba(255,255,255,0.06);
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-  color: var(--text);
-}
-
-/* Donut Chart & Info */
-.bifurcation {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.bif-info {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.bif-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 10px;
-}
-
-.bif-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.bif-value {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text);
-}
-
-/* =====================================================
-   SMART SUMMARY + MONTHLY SUMMARY
-===================================================== */
-
-.summary-warning {
-  padding: 12px;
-  border-radius: 12px;
-  background: #fff1c4;
-  color: #5b4400;
-  margin-bottom: 10px;
-  font-weight: 600;
-}
-
-.summary-advice {
-  padding: 12px;
-  border-radius: 12px;
-  background: #d1ffd6;
-  color: #0a4b1d;
-  font-weight: 600;
-}
-
-.category-summary-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 6px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  color: var(--text);
-}
-
-/* =====================================================
-   HIDDEN
-===================================================== */
-
-.hidden { display: none; }
