@@ -2,83 +2,84 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Kharcha Tracker</title>
 
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
-
-  <div class="wrap" id="app" data-theme="dark">
+  <div id="app" class="wrap" data-theme="dark">
 
     <!-- HEADER -->
     <header class="header">
       <div class="brand">
-        <img src="logo.png" class="logo-image" alt="Kharcha Tracker Logo">
-
+        <img src="logo.png" alt="logo" class="logo-image">
         <div class="title">
-          <h1>Kharcha Tracker</h1>
-          <p>Tracking your daily expense so that it doesn’t hurt on the month end</p>
+          <h1 class="title-main">Kharcha Tracker</h1>
+          <p class="title-sub">Tracking your daily expense so that it doesn’t hurt on the month end</p>
         </div>
       </div>
 
       <div class="controls">
-        <button class="btn-small" id="themeToggle">Theme</button>
-        <button class="btn-small" id="exportBtn">Export CSV</button>
-        <button class="btn-small" id="clearBtn">Clear</button>
+        <button id="themeToggle" class="btn-small">Theme</button>
+        <button id="exportBtn" class="btn-small">Export CSV</button>
+        <button id="clearBtn" class="btn-small">Clear</button>
       </div>
     </header>
 
-    <!-- MAIN GRID -->
+    <!-- GRID -->
     <main class="grid">
 
-      <!-- LEFT SIDE -->
-      <section>
+      <!-- LEFT COLUMN -->
+      <section class="col-left">
 
         <!-- ADD EXPENSE -->
         <div class="card">
           <h2>Add Expense</h2>
 
-          <div class="row three">
-            <input id="nameInput" class="input" placeholder="Expense name">
-            <input id="amountInput" class="input" type="number" placeholder="₹ Amount">
-            <select id="categorySelect" class="input"></select>
+          <div class="form-row">
+            <input id="nameInput" class="input" placeholder="Expense name" />
+            <input id="amountInput" class="input input-narrow" type="number" placeholder="₹ Amount" />
+            <select id="categorySelect" class="input">
+              <!-- populated by JS -->
+            </select>
           </div>
 
           <div id="otherCatRow" class="hidden">
-            <input id="otherCategoryInput" class="input" placeholder="Enter custom category">
+            <input id="otherCategoryInput" class="input" placeholder="Enter custom category (e.g., Gym)" />
           </div>
 
-          <button class="btn-primary" id="addExpenseBtn" style="margin-top:12px;">Add Expense</button>
+          <div style="margin-top:12px">
+            <button id="addExpenseBtn" class="btn-primary">Add Expense</button>
+          </div>
         </div>
 
         <!-- MONTH SUMMARY -->
         <div class="card">
           <h2>This Month</h2>
-
           <div class="summary-row">
             <div>
               <div class="muted">Total spent</div>
               <div id="monthTotal" class="big-number">₹0</div>
             </div>
 
-            <div class="top3-box">
+            <div style="min-width:200px">
               <div class="muted">Top categories</div>
               <div id="top3" class="top3-list"></div>
             </div>
           </div>
 
-          <canvas id="miniBar" height="90" style="margin-top:12px;"></canvas>
+          <div style="margin-top:18px">
+            <canvas id="miniBar" height="100"></canvas>
+          </div>
         </div>
 
-        <!-- WALLET TRACKER -->
+        <!-- WALLET -->
         <div class="card">
           <h2>Wallet Tracker</h2>
-
           <div class="wallet-row">
-            <input id="walletInput" class="wallet-input" type="number" placeholder="₹ Set wallet">
+            <input id="walletInput" class="wallet-input" type="number" placeholder="₹ Set wallet" />
             <button id="walletSetBtn" class="btn-set">Set</button>
           </div>
 
@@ -88,56 +89,45 @@
             </div>
 
             <div class="bif-info">
-              <div class="bif-row">
-                <div class="bif-label"><span class="chip red"></span> Spent</div>
-                <div id="spentAmt" class="bif-value">₹0</div>
-              </div>
-
-              <div class="bif-row">
-                <div class="bif-label"><span class="chip green"></span> Left</div>
-                <div id="leftAmt" class="bif-value">₹0</div>
-              </div>
-
-              <div class="bif-row">
-                <div class="bif-label">Wallet</div>
-                <div id="walletTotal" class="bif-value">₹0</div>
-              </div>
+              <div class="bif-row"><div class="bif-label"><span class="chip red"></span> Spent</div><div id="spentAmt" class="bif-value">₹0</div></div>
+              <div class="bif-row"><div class="bif-label"><span class="chip green"></span> Left</div><div id="leftAmt" class="bif-value">₹0</div></div>
+              <div class="bif-row"><div class="bif-label">Wallet</div><div id="walletTotal" class="bif-value">₹0</div></div>
             </div>
           </div>
-
-          <div id="adviceArea" style="margin-top:12px;"></div>
         </div>
 
         <!-- EXPENSE LIST -->
         <div class="card">
           <h2>Your Expenses</h2>
-          <div id="expenseList"></div>
+          <div id="expenseList" style="margin-top:12px"></div>
         </div>
       </section>
 
       <!-- RIGHT COLUMN -->
-      <aside>
+      <aside class="col-right">
 
-        <!-- SMART SUMMARY -->
+        <!-- SPEND WISE BANNER (always visible) -->
         <div class="card">
-          <h2>Smart Summary</h2>
-          <div id="smartSummaryText"></div>
+          <h2>Spend wisely</h2>
+          <div id="spendBanner" class="banner-neutral">
+            <div id="bannerMain" class="banner-main">Keep tracking — small steps build big savings.</div>
+            <div id="bannerSub" class="banner-sub"></div>
+          </div>
         </div>
 
         <!-- MONTHLY CATEGORY SUMMARY -->
         <div class="card">
           <h2>Monthly Category Summary</h2>
-          <div id="categorySummary"></div>
+          <div id="categorySummary" style="margin-top:8px"></div>
         </div>
 
-        <!-- CATEGORIES -->
+        <!-- CATEGORIES (color legend) -->
         <div class="card">
           <h2>Categories</h2>
-          <div id="catColors"></div>
+          <div id="catColors" style="margin-top:8px"></div>
         </div>
 
       </aside>
-
     </main>
   </div>
 
