@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kharcha Tracker</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #f2f3f7;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 5px;
+      font-size: 36px;
+      font-weight: 600;
+    }
+
+    .tagline {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #555;
+      font-size: 16px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    input, select, button {
+      padding: 12px;
+      font-size: 16px;
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #4C7BF3;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    button:hover {
+      background: #3a63c9;
+    }
+
+    .expense-item {
+      display: flex;
+      justify-content: space-between;
+      background: #e9ecf3;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+    }
+
+    .delete-btn {
+      background: red;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .total-box {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 600;
+      padding: 15px;
+      background: #4C7BF3;
+      color: white;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>Kharcha Tracker</h1>
+    <p class="tagline">Tracking your daily expense so that it doesn’t hurt on the month end</p>
+
+    <!-- INPUT CARD -->
+    <div class="card">
+      <h2>Add New Expense</h2>
+      <div class="form-row">
+        <input type="text" id="expenseName" placeholder="Expense Name">
+        <input type="number" id="expenseAmount" placeholder="Amount (₹)">
+        
+        <select id="expenseCategory">
+          <option value="">Select Category</option>
+          <option>Food</option>
+          <option>Travel</option>
+          <option>Rent</option>
+          <option>Shopping</option>
+          <option>Health</option>
+          <option>College</option>
+          <option>Entertainment</option>
+          <option>Other</option>
+        </select>
+
+        <button onclick="addExpense()">Add Expense</button>
+      </div>
+    </div>
+
+    <!-- TOTAL -->
+    <div class="card total-box">
+      Total Spent: ₹<span id="totalAmount">0</span>
+    </div>
+
+    <!-- PIE CHART -->
+    <div class="card">
+      <h2>Expense Breakdown</h2>
+      <canvas id="pieChart"></canvas>
+    </div>
+
+    <!-- EXPENSE LIST -->
+    <div class="card">
+      <h2>All Expenses</h2>
+      <div id="expenseList"></div>
+    </div>
+
+  </div>
+
+  <script>
+    let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+    let chart;
+
+    function updateChart() {
+      const ctx = document.getElementById("pieChart").getContext("2d");
+
+      const categoryTotals = {};
+      expenses.forEach(exp => {
+        categoryTotals[exp.category] = (categoryTotals[exp.category] || 0) + exp.amount;
+      });
+
+      const labels = Object.keys(categoryTotals);
+      const data = Object.values(categoryTotals);
+
+      if (chart) chart.destroy();
+
+      chart = new Chart(ctx, {
+        type: "pie",
+        data: {
+          labels: labels,
+          datasets: [{ data: data }]
+        }
+      });
+    }
+
+    function updateUI() {
+      const list = document.getElementById("expenseList");
+      const totalAmount = document.getElementById("totalAmount");
+
+      list.innerHTML = "";
+      let total = 0;
+
+      expenses.forEach((exp, index) => {
+        total += exp.amount;
+
+        const div = document.createElement("div");
+        div.className = "expense-item";
+        div.innerHTML = `
+          <strong>${exp.name}</strong> 
+          <span>₹${exp.amount} | ${exp.category}</span>
+          <button class="delete-btn" onclick="deleteExpense(${index})">X</button>
+        `;
+        list.appendChild(div);
+      });
+
+      totalAmount.textContent = total;
+      localStorage.setItem("expenses", JSON.stringify(expenses));
+      updateChart();
+    }
+
+    function addExpense() {
+      const name = document.getElementById("expenseName").value;
+      const amount = Number(document.getElementById("expenseAmount").value);
+      const category = document.getElementById("expenseCategory").value;
+
+      if (!name || !amount || !category) {
+        alert("Please fill all fields!");
+        return;
+      }
+
+      expenses.push({ name, amount, category });
+      document.getElementById("expenseName").value = "";
+      document.getElementById("expenseAmount").value = "";
+      document.getElementById("expenseCategory").value = "";
+      updateUI();
+    }
+
+    function deleteExpense(index) {
+      expenses.splice(index, 1);
+      updateUI();
+    }
+
+    updateUI();
+  </script>
+
+</body>
+</html>
