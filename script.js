@@ -1,15 +1,20 @@
-/* --------- LOCAL STORAGE KEYS --------- */
-const LS_EXP = "kt_exp_v2";
-const LS_CAT = "kt_cat_v2";
-const LS_WAL = "kt_wallet_v2";
-const LS_THEME = "kt_theme_v2";
+/* =======================================================
+   KHARCHA TRACKER – FULL JAVASCRIPT (FINAL)
+==========================================================*/
 
-const DEFAULT_CATS = [
+/* ---------- LOCAL STORAGE KEYS ---------- */
+const LS_EXP = "kt_exp_v3";
+const LS_CAT = "kt_cat_v3";
+const LS_WAL = "kt_wallet_v3";
+const LS_THEME = "kt_theme_v3";
+
+/* ---------- DEFAULT CATEGORIES ---------- */
+let DEFAULT_CATS = [
   "Food", "Shopping", "Entertainment", "Travel", "Rent",
   "College", "Health", "Other"
 ];
 
-const CAT_COLORS = {
+let CAT_COLORS = {
   Food: "#ffd857",
   Shopping: "#ff7ab6",
   Entertainment: "#b37bff",
@@ -20,56 +25,41 @@ const CAT_COLORS = {
   Other: "#c9c9c9"
 };
 
-/* --------- INITIAL DATA --------- */
+/* ---------- INITIAL LOAD ---------- */
 let expenses = JSON.parse(localStorage.getItem(LS_EXP) || "[]");
 let categories = JSON.parse(localStorage.getItem(LS_CAT) || JSON.stringify(DEFAULT_CATS));
 let wallet = Number(localStorage.getItem(LS_WAL) || 0);
 
+/* ---------- SAVE DATA ---------- */
 function saveAll() {
   localStorage.setItem(LS_EXP, JSON.stringify(expenses));
   localStorage.setItem(LS_CAT, JSON.stringify(categories));
   localStorage.setItem(LS_WAL, wallet);
 }
 
+/* ---------- HELPERS ---------- */
 function today() {
   return new Date().toISOString().slice(0, 10);
 }
 
-/* --------- DOM SHORTCUTS --------- */
+/* ---------- DOM ---------- */
 const categorySelect = document.getElementById("categorySelect");
 const catColorsDiv = document.getElementById("catColors");
 const expenseList = document.getElementById("expenseList");
 const monthTotalEl = document.getElementById("monthTotal");
 const top3El = document.getElementById("top3");
-const adviceArea = document.getElementById("adviceArea");
 
-const miniBarCtx = document.getElementById("miniBar").getContext("2d");
-const bifCtx = document.getElementById("bifChart").getContext("2d");
+const smartSummaryText = document.getElementById("smartSummaryText");
+const categorySummary = document.getElementById("categorySummary");
 
-let miniBarChart = null;
-let bifChart = null;
+const otherCatRow = document.getElementById("otherCatRow");
+const otherCategoryInput = document.getElementById("otherCategoryInput");
 
-/* --------- POPULATE CATEGORY SELECT --------- */
-function loadCategories() {
-  categorySelect.innerHTML = `<option value="">Select Category</option>`;
+let miniBarChart, bifChart;
 
-  categories.forEach(c => {
-    let opt = document.createElement("option");
-    opt.value = c;
-    opt.textContent = c;
-    categorySelect.appendChild(opt);
-  });
-
-  catColorsDiv.innerHTML = "";
-  categories.forEach(c => {
-    catColorsDiv.innerHTML += `
-      <div style="display:flex;align-items:center;gap:10px">
-        <span class="chip" style="background:${CAT_COLORS[c] || randomColor(c)}"></span>
-        <span>${c}</span>
-      </div>
-    `;
-  });
-}
+/* =======================================================
+   LOAD CATEGORY DROPDOWN + CATEGORY COLOR DISPLAY
+==========================================================*/
 
 function randomColor(str) {
   let h = 0;
@@ -78,60 +68,85 @@ function randomColor(str) {
   return "#" + "00000".substring(0, 6 - c.length) + c;
 }
 
+function loadCategories() {
+  categorySelect.innerHTML = `<option value="">Category</option>`;
+  
+  categories.forEach(c => {
+    let opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    categorySelect.appendChild(opt);
+
+    if (!CAT_COLORS[c]) CAT_COLORS[c] = randomColor(c);
+  });
+
+  catColorsDiv.innerHTML = "";
+  categories.forEach(c => {
+    catColorsDiv.innerHTML += `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span class="chip" style="background:${CAT_COLORS[c]}"></span>
+        <span>${c}</span>
+      </div>
+    `;
+  });
+}
+
 loadCategories();
 
-/* --------- ADD CATEGORY --------- */
-document.getElementById("addCategoryBtn").addEventListener("click", () => {
-  const val = document.getElementById("newCategory").value.trim();
-  if (!val) return alert("Enter category");
-  if (categories.includes(val)) return alert("Already exists");
+/* =======================================================
+   SHOW CUSTOM CATEGORY WHEN OTHER IS SELECTED
+==========================================================*/
 
-  categories.push(val);
-  saveAll();
-  loadCategories();
-  document.getElementById("newCategory").value = "";
+categorySelect.addEventListener("change", () => {
+  if (categorySelect.value === "Other") {
+    otherCatRow.classList.remove("hidden");
+  } else {
+    otherCatRow.classList.add("hidden");
+    otherCategoryInput.value = "";
+  }
 });
 
-/* --------- ADD EXPENSE --------- */
+/* =======================================================
+   ADD EXPENSE
+==========================================================*/
+
 document.getElementById("addExpenseBtn").addEventListener("click", () => {
   const name = document.getElementById("nameInput").value.trim();
   const amount = Number(document.getElementById("amountInput").value);
-  const cat = categorySelect.value;
+  let cat = categorySelect.value;
 
-  if (!name || !amount || !cat) return alert("Fill all fields");
+  if (!name || !amount || !cat) return alert("Fill all fields.");
+
+  if (cat === "Other") {
+    const customCat = otherCategoryInput.value.trim();
+    if (!customCat) return alert("Enter custom category.");
+
+    // Add new category permanently
+    if (!categories.includes(customCat)) {
+      categories.push(customCat);
+      CAT_COLORS[customCat] = randomColor(customCat);
+      saveAll();
+      loadCategories();
+    }
+
+    cat = customCat;
+  }
 
   expenses.push({ name, amount, category: cat, date: today() });
   saveAll();
 
   document.getElementById("nameInput").value = "";
   document.getElementById("amountInput").value = "";
+  categorySelect.value = "";
+  otherCatRow.classList.add("hidden");
 
   renderAll();
 });
 
-/* --------- EXPORT CSV --------- */
-document.getElementById("exportBtn").addEventListener("click", exportCSV);
-document.getElementById("exportCsvBtn").addEventListener("click", exportCSV);
+/* =======================================================
+   CLEAR ALL
+==========================================================*/
 
-function exportCSV() {
-  if (!expenses.length) return alert("No data to export.");
-
-  let csv = "date,name,category,amount\n";
-  expenses.forEach(e => {
-    csv += `${e.date},"${e.name}",${e.category},${e.amount}\n`;
-  });
-
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "kharcha.csv";
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-/* --------- CLEAR ALL --------- */
 document.getElementById("clearBtn").addEventListener("click", () => {
   if (!confirm("Clear all data?")) return;
   localStorage.clear();
@@ -143,31 +158,55 @@ document.getElementById("clearBtn").addEventListener("click", () => {
   renderAll();
 });
 
-/* --------- CLEAR MONTH --------- */
-document.getElementById("clearMonthBtn")?.addEventListener("click", () => {
-  const pref = new Date().toISOString().slice(0, 7);
-  expenses = expenses.filter(e => !e.date.startsWith(pref));
-  saveAll();
-  renderAll();
-});
+/* =======================================================
+   EXPORT CSV
+==========================================================*/
 
-/* --------- WALLET SET --------- */
+document.getElementById("exportBtn").addEventListener("click", exportCSV);
+
+function exportCSV() {
+  if (!expenses.length) return alert("No data.");
+
+  let csv = "date,name,category,amount\n";
+  expenses.forEach(e => csv += `${e.date},"${e.name}",${e.category},${e.amount}\n`);
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "kharcha.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* =======================================================
+   WALLET SET
+==========================================================*/
+
 document.getElementById("walletSetBtn").addEventListener("click", () => {
-  wallet = Number(document.getElementById("walletInput").value) || 0;
+  wallet = Number(document.getElementById("walletInput").value || 0);
   saveAll();
   renderAll();
 });
 
-/* --------- CALCULATIONS --------- */
+/* =======================================================
+   MONTH EXPENSES
+==========================================================*/
+
 function monthExpenses() {
   const pref = new Date().toISOString().slice(0, 7);
   return expenses.filter(e => e.date.startsWith(pref));
 }
 
-/* --------- TOP / SUMMARY --------- */
+/* =======================================================
+   MONTH SUMMARY + TOP 3
+==========================================================*/
+
 function renderMonthSummary() {
   const me = monthExpenses();
   const total = me.reduce((s, x) => s + x.amount, 0);
+
   monthTotalEl.textContent = "₹" + total;
 }
 
@@ -175,23 +214,26 @@ function renderTop3() {
   const me = monthExpenses();
   const map = {};
 
-  me.forEach(e => {
-    map[e.category] = (map[e.category] || 0) + e.amount;
-  });
+  me.forEach(e => map[e.category] = (map[e.category] || 0) + e.amount);
 
-  const arr = Object.entries(map).sort((a,b) => b[1] - a[1]).slice(0,3);
+  const top = Object.entries(map)
+    .sort((a,b) => b[1] - a[1])
+    .slice(0,3);
 
-  top3El.innerHTML = arr.length
-    ? arr.map(([c,v]) => `
+  top3El.innerHTML = top.length
+    ? top.map(([c, v]) => `
         <div style="display:flex;justify-content:space-between">
-          <div><span class="chip" style="background:${CAT_COLORS[c]};margin-right:6px"></span>${c}</div>
+          <div><span class="chip" style="background:${CAT_COLORS[c]}"></span> ${c}</div>
           <strong>₹${v}</strong>
         </div>
       `).join("")
-    : `<div class="muted">No expenses yet</div>`;
+    : `<div class="muted">No data</div>`;
 }
 
-/* --------- MINI BAR CHART --------- */
+/* =======================================================
+   MINI BAR CHART
+==========================================================*/
+
 function renderMiniBar() {
   const labels = [];
   const vals = [];
@@ -213,7 +255,7 @@ function renderMiniBar() {
 
   if (miniBarChart) miniBarChart.destroy();
 
-  miniBarChart = new Chart(miniBarCtx, {
+  miniBarChart = new Chart(document.getElementById("miniBar").getContext("2d"), {
     type: "bar",
     data: {
       labels,
@@ -229,7 +271,10 @@ function renderMiniBar() {
   });
 }
 
-/* --------- BIFURCATION (DONUT) --------- */
+/* =======================================================
+   DONUT (BIFURCATION)
+==========================================================*/
+
 function renderBifurcation() {
   const me = monthExpenses();
   const spent = me.reduce((s,x)=>s+x.amount,0);
@@ -241,7 +286,7 @@ function renderBifurcation() {
 
   if (bifChart) bifChart.destroy();
 
-  bifChart = new Chart(bifCtx, {
+  bifChart = new Chart(document.getElementById("bifChart").getContext("2d"), {
     type: "doughnut",
     data: {
       labels: ["Spent", "Left"],
@@ -251,29 +296,31 @@ function renderBifurcation() {
       }]
     },
     options: {
-      cutout: "60%",
+      cutout: "62%",
       plugins: { legend: { display:false }, tooltip: { enabled:false }}
     }
   });
 }
 
-/* --------- EXPENSE LIST --------- */
+/* =======================================================
+   RENDER EXPENSE LIST
+==========================================================*/
+
 function renderList() {
   const me = monthExpenses();
   expenseList.innerHTML = "";
 
   if (!me.length) {
-    expenseList.innerHTML = `<div class="muted">No expenses this month.</div>`;
+    expenseList.innerHTML = `<div class="muted">No expenses yet.</div>`;
     return;
   }
 
   me.slice().reverse().forEach(e => {
     const idx = expenses.indexOf(e);
-
     expenseList.innerHTML += `
       <div class="expense-item">
         <div class="expense-left">
-          <span class="chip" style="background:${CAT_COLORS[e.category] || "#999"}"></span>
+          <span class="chip" style="background:${CAT_COLORS[e.category]}"></span>
           <strong>${e.name}</strong>
         </div>
 
@@ -286,77 +333,73 @@ function renderList() {
 }
 
 window.deleteExpense = function(i) {
-  if (!confirm("Delete this expense?")) return;
+  if (!confirm("Delete expense?")) return;
   expenses.splice(i,1);
   saveAll();
   renderAll();
 };
 
-/* --------- ADVICE --------- */
-function renderAdvice() {
-  adviceArea.innerHTML = "";
-  const me = monthExpenses();
-  const risky = (me.filter(e=>["Food","Shopping","Entertainment"].includes(e.category))
-                .reduce((s,x)=>s+x.amount,0));
+/* =======================================================
+   SMART SUMMARY CARD
+==========================================================*/
 
-  if (risky > 5000) {
-    adviceArea.innerHTML = `
-      <div class="advice">
-        ⚠ Your spending on leisure categories crossed ₹${risky}.
-        Consider investing the extra money instead!
+function renderSmartSummary() {
+  smartSummaryText.innerHTML = "";
+  const me = monthExpenses();
+
+  const spent = me.reduce((s,x)=>s+x.amount,0);
+  const left = Math.max(wallet - spent, 0);
+
+  /* -------- Wallet Warning -------- */
+  if (wallet > 0 && left <= wallet * 0.25) {
+    smartSummaryText.innerHTML += `
+      <div class="summary-warning">
+        ⚠ Spend wisely — only ₹${left} left from your wallet budget.
+      </div>
+    `;
+  }
+
+  /* -------- SIP Advice -------- */
+  const leisure = me.filter(e =>
+    ["Food","Shopping","Entertainment","Leisure"].includes(e.category)
+  ).reduce((s,x)=>s+x.amount,0);
+
+  if (leisure > 5000) {
+    smartSummaryText.innerHTML += `
+      <div class="summary-advice">
+        💡 If you invested even 10% of this (₹${Math.round(leisure*0.1)}) into a SIP,
+        you'd create great long-term returns. Spend wisely!
       </div>
     `;
   }
 }
 
-/* --------- QR GENERATOR (QUIRKY RANDOM) --------- */
-const qrStyles = [
-  "qr-style-neon", "qr-style-pastel",
-  "qr-style-gradient", "qr-style-sticker",
-  "qr-style-emoji"
-];
+/* =======================================================
+   MONTHLY CATEGORY SUMMARY
+==========================================================*/
 
-const emojis = ["🔥","✨","💸","😎","🚀","🎉","💰","💯"];
+function renderCategorySummary() {
+  const me = monthExpenses();
+  const map = {};
 
-const qrFrame = document.getElementById("qrFrame");
-const qrImg = document.getElementById("qrImg");
+  me.forEach(e => map[e.category] = (map[e.category] || 0) + e.amount);
 
-function randomPick(arr) {
-  return arr[Math.floor(Math.random()*arr.length)];
+  const sorted = Object.entries(map).sort((a,b)=>b[1]-a[1]);
+
+  categorySummary.innerHTML = sorted.length
+    ? sorted.map(([c,v]) => `
+        <div class="category-summary-item">
+          <span>${c}</span>
+          <strong>₹${v}</strong>
+        </div>
+      `).join("")
+    : `<div class="muted">No data this month.</div>`;
 }
 
-function generateQrData(upi, name) {
-  let uri = `upi://pay?pa=${encodeURIComponent(upi)}`;
-  if (name) uri += `&pn=${encodeURIComponent(name)}`;
+/* =======================================================
+   THEME SWITCH
+==========================================================*/
 
-  return (
-    "https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=" +
-    encodeURIComponent(uri)
-  );
-}
-
-function applyQrStyle() {
-  qrFrame.classList.remove(...qrStyles);
-  qrFrame.classList.add(randomPick(qrStyles));
-
-  qrFrame.querySelector(".e1").textContent = randomPick(emojis);
-  qrFrame.querySelector(".e2").textContent = randomPick(emojis);
-  qrFrame.querySelector(".e3").textContent = randomPick(emojis);
-}
-
-document.getElementById("genQrBtn").addEventListener("click", () => {
-  const upi = document.getElementById("upiInput").value.trim();
-  const name = document.getElementById("upiName").value.trim();
-
-  if (!upi) return alert("Enter UPI ID");
-
-  qrImg.src = generateQrData(upi, name);
-  applyQrStyle();
-});
-
-document.getElementById("regenQrBtn").addEventListener("click", applyQrStyle);
-
-/* --------- THEME SWITCH --------- */
 const app = document.getElementById("app");
 const themeToggle = document.getElementById("themeToggle");
 
@@ -373,7 +416,10 @@ themeToggle.addEventListener("click", () => {
   applyTheme(theme);
 });
 
-/* --------- RENDER ALL --------- */
+/* =======================================================
+   RENDER EVERYTHING
+==========================================================*/
+
 function renderAll() {
   loadCategories();
   renderMonthSummary();
@@ -381,13 +427,13 @@ function renderAll() {
   renderMiniBar();
   renderBifurcation();
   renderList();
-  renderAdvice();
+  renderSmartSummary();
+  renderCategorySummary();
 }
 
-/* --------- BOOTSTRAP --------- */
-function bootstrap() {
-  renderAll();
-  applyQrStyle();
-}
+/* =======================================================
+   BOOTSTRAP
+==========================================================*/
 
+function bootstrap() { renderAll(); }
 bootstrap();
