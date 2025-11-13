@@ -1,562 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Kharcha Tracker — Pro</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kharcha Tracker</title>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-  :root{
-    --bg1:#070707; --bg2:#1b1b1b; --card: rgba(255,255,255,0.06);
-    --accent:#ffd857; --muted: rgba(255,255,255,0.75);
-  }
-
-  [data-theme="light"]{
-    --bg1:#f2f5fb; --bg2:#e6ebf7; --card:#fff;
-    --accent:#2b7cff; --muted:#333;
-    color:#111;
-  }
-
-  body{
-    margin:0; 
-    font-family:Poppins, sans-serif;
-    background:linear-gradient(180deg,var(--bg1),var(--bg2));
-    color:var(--muted);
-  }
-
-  .wrap{max-width:1000px;margin:28px auto;padding:18px;}
-  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
-
-  /* Branding */
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:56px;height:56px;background:linear-gradient(135deg,var(--accent),#ff9d57);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#111}
-  h1{margin:0;font-size:22px}
-  .tag{font-size:13px;opacity:0.8;margin-top:2px}
-
-  .controls{display:flex;gap:10px}
-  .tiny{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;background:rgba(255,255,255,0.06);color:var(--muted)}
-
-  /* Layout grid */
-  .grid{display:grid;grid-template-columns:1fr 340px;gap:20px}
-  @media(max-width:900px){.grid{grid-template-columns:1fr;}}
-
-  .card{
-    background:var(--card);
-    padding:20px;
-    border-radius:16px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.4);
-    margin-bottom:20px;
-  }
-
-  .card h2{margin:0 0 12px;font-size:18px;font-weight:600}
-
-  /* Inputs */
-  input, select{
-    width:100%;padding:12px;border-radius:10px;
-    border:none;background:rgba(255,255,255,0.05);
-    color:inherit;margin-bottom:12px;
-  }
-
-  /* Buttons */
-  .btn{padding:14px;border-radius:12px;border:none;font-weight:600;cursor:pointer}
-  .add-btn{background:var(--accent);color:#111}
-  .sec-btn{background:#00e5ff;color:#003b49}
-  .ghost-btn{background:transparent;border:1px solid rgba(255,255,255,0.15)}
-
-  /* Expense items */
-  .expense-item{
-    display:flex;justify-content:space-between;align-items:center;
-    padding:12px;border-radius:12px;margin-bottom:10px;
-    background:rgba(255,255,255,0.08);
-  }
-
-  .chip{width:12px;height:12px;border-radius:3px;margin-right:6px}
-
-  .delete{background:#ff4b5c;color:#fff;border:none;padding:5px 9px;border-radius:8px;cursor:pointer}
-
-  /* Meter */
-  .meter{
-    width:120px;height:120px;border-radius:50%;
-    background:conic-gradient(var(--accent) var(--pct,0%),rgba(255,255,255,0.1) 0%);
-    display:grid;place-items:center;
-  }
-  .meter span{font-weight:700;color:#111;background:transparent}
-
-  /* Charts */
-  canvas{max-width:300px;margin:auto}
-
-  /* Advice box */
-  .advice{
-    padding:14px;background:#ffe9c1;color:#333;
-    border-radius:12px;margin-top:10px;font-weight:600
-  }
-
-  /* Popup */
-  .popup{
-    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-    background:var(--card);padding:22px;border-radius:14px;
-    display:none;z-index:999;max-width:360px;width:80%;
-  }
-</style>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
 
-<div class="wrap" id="app" data-theme="dark">
+  <div class="wrap" id="app" data-theme="dark">
 
-  <!-- HEADER -->
-  <header>
-    <div class="brand">
-      <div class="logo">KT</div>
-      <div>
-        <h1>Kharcha Tracker</h1>
-        <div class="tag">Track your monthly expenses smartly</div>
-      </div>
-    </div>
+    <!-- HEADER -->
+    <header class="header">
+      <div class="brand">
+        <img src="logo.png" class="logo-image" alt="Kharcha Tracker Logo">
 
-    <div class="controls">
-      <button class="tiny" id="themeBtn">Theme</button>
-      <button class="tiny" id="exportCsv">CSV</button>
-      <button class="tiny" id="clearAll">Clear</button>
-    </div>
-  </header>
-
-  <main class="grid">
-
-    <!-- LEFT SIDE: EXPENSE INPUT + DASHBOARD + CHARTS + LIST -->
-    <section>
-
-      <!-- ADD EXPENSE -->
-      <div class="card">
-        <h2>Add Expense</h2>
-
-        <!-- name + amount -->
-        <input id="nameInput" placeholder="Expense name">
-        <input id="amountInput" type="number" placeholder="Amount (₹)">
-
-        <!-- category -->
-        <select id="categorySelect"></select>
-
-        <!-- add custom category -->
-        <div style="display:flex;gap:10px">
-          <input id="newCategory" placeholder="New category">
-          <button class="sec-btn btn" id="addCategory">Add</button>
-        </div>
-
-        <button class="add-btn btn" id="addExpense">Add Expense</button>
-      </div>
-
-      <!-- MONTH SUMMARY -->
-      <div class="card">
-        <h2>This Month</h2>
-        <h3 id="monthTotal" style="margin:0;font-size:26px">₹0</h3>
-        <div id="monthRange" style="opacity:0.8;font-size:13px;margin-top:4px"></div>
-
-        <!-- Top 3 categories -->
-        <h3 style="margin-top:18px">Top Categories</h3>
-        <div id="top3List"></div>
-
-        <!-- 7-Day bar chart -->
-        <canvas id="miniBar" height="140"></canvas>
-
-        <!-- Wallet -->
-        <h3 style="margin-top:20px">Wallet</h3>
-        <div style="display:flex;gap:10px;margin-bottom:14px">
-          <input id="walletInput" placeholder="Wallet amount" type="number">
-          <button class="ghost-btn btn" id="setWallet">Set</button>
-        </div>
-
-        <div class="meter" id="meter"><span id="meterText">0%</span></div>
-      </div>
-
-      <!-- PIE CHART + AI ADVICE -->
-      <div class="card">
-        <h2>Category Breakdown</h2>
-        <canvas id="pieChart"></canvas>
-        <div id="adviceArea"></div>
-      </div>
-
-      <!-- EXPENSE LIST -->
-      <div class="card">
-        <h2>Your Expenses (Month-wise)</h2>
-        <div id="listArea"></div>
-      </div>
-
-    </section>
-
-    <!-- RIGHT SIDE: QR + CATEGORY COLORS + EXPORT -->
-    <aside>
-
-      <!-- EXPORT TOOLS -->
-      <div class="card">
-        <h2>Export</h2>
-        <button class="btn add-btn" id="exportCsv2">Download CSV</button>
-      </div>
-
-      <!-- UPI QR GENERATOR -->
-      <div class="card">
-        <h2>UPI QR (GenZ Style)</h2>
-
-        <input id="upiId" placeholder="yourupi@bank">
-        <input id="upiName" placeholder="Name (optional)">
-        <button class="sec-btn btn" id="genQR">Generate QR</button>
-
-        <div id="qrBox" style="margin-top:14px;display:none">
-          <img id="qrImg" width="170" style="border-radius:10px">
+        <div class="title">
+          <h1>Kharcha Tracker</h1>
+          <p>Tracking your daily expense so that it doesn’t hurt on the month end!</p>
         </div>
       </div>
 
-      <!-- CATEGORY COLORS -->
-      <div class="card">
-        <h2>Category Colors</h2>
-        <div id="catColors"></div>
+      <div class="controls">
+        <button class="btn-small" id="themeToggle">Theme</button>
+        <button class="btn-small" id="exportBtn">Export CSV</button>
+        <button class="btn-small" id="clearBtn">Clear</button>
       </div>
+    </header>
 
-    </aside>
+    <!-- MAIN GRID -->
+    <main class="grid">
 
-  </main>
-</div>
+      <!-- LEFT SIDE -->
+      <section>
 
-<div class="popup" id="popup"></div>
+        <!-- ADD EXPENSE -->
+        <div class="card">
+          <h2>Add Expense</h2>
 
-<script>
-/* ============================
-   BASIC STORAGE + CONSTANTS
-=============================*/
-const LS = { EXP:"kt_exp", CAT:"kt_cat", WAL:"kt_wal", THEME:"kt_theme" };
-const DEFAULT_CATS = ["Food","Shopping","Entertainment","Travel","Rent","College","Health","Other"];
-let expenses = JSON.parse(localStorage.getItem(LS.EXP) || "[]");
-let categories = JSON.parse(localStorage.getItem(LS.CAT) || JSON.stringify(DEFAULT_CATS));
-let wallet = Number(localStorage.getItem(LS.WAL) || 0);
+          <div class="row">
+            <input id="nameInput" class="input" placeholder="Expense name">
+            <input id="amountInput" class="input-small input" type="number" placeholder="₹ Amount">
+          </div>
 
-/* ============================
-   BASIC UI ELEMENTS
-=============================*/
-const catSelect = document.getElementById("categorySelect");
-const listArea = document.getElementById("listArea");
-const top3List = document.getElementById("top3List");
-const monthTotal = document.getElementById("monthTotal");
-const monthRange = document.getElementById("monthRange");
-const adviceArea = document.getElementById("adviceArea");
+          <select id="categorySelect" class="input"></select>
 
-/* ============================
-   CATEGORY COLORS
-=============================*/
-const CAT_COLORS = {
-  "Food":"#ffd857","Shopping":"#ff7ab6","Entertainment":"#b37bff",
-  "Travel":"#57c7ff","Rent":"#8ee5a1","College":"#ffd2a8",
-  "Health":"#ff9b4a","Other":"#c9c9c9"
-};
-function colorFor(cat){
-  return CAT_COLORS[cat] || randomColor(cat);
-}
-function randomColor(cat){
-  let h = 0; for(let i=0;i<cat.length;i++) h = cat.charCodeAt(i)+((h<<5)-h);
-  return "#"+((h>>24)&0xFF).toString(16).padStart(2,0)+((h>>16)&0xFF).toString(16).padStart(2,0)+((h>>8)&0xFF).toString(16).padStart(2,0);
-}
+          <div class="row">
+            <input id="newCategory" class="input" placeholder="New Category">
+            <button class="btn-accent" id="addCategoryBtn">Add</button>
+          </div>
 
-/* ============================
-   POPULATE CATEGORY SELECTOR
-=============================*/
-function loadCategories(){
-  catSelect.innerHTML = "<option value=''>Select Category</option>";
-  categories.forEach(c=>{
-    let o = document.createElement("option");
-    o.value = o.textContent = c;
-    catSelect.appendChild(o);
-  });
-}
-loadCategories();
+          <button class="btn-primary" id="addExpenseBtn" style="margin-top:12px;">Add Expense</button>
+        </div>
 
-/* ============================
-   SAVE TO LOCAL STORAGE
-=============================*/
-function saveAll(){
-  localStorage.setItem(LS.EXP, JSON.stringify(expenses));
-  localStorage.setItem(LS.CAT, JSON.stringify(categories));
-  localStorage.setItem(LS.WAL, wallet);
-}
+        <!-- MONTH SUMMARY -->
+        <div class="card">
+          <h2>This Month</h2>
 
-/* ============================
-   ADD EXPENSE (MONTH-WISE)
-=============================*/
-document.getElementById("addExpense").onclick = ()=>{
-  let name = document.getElementById("nameInput").value.trim();
-  let amount = Number(document.getElementById("amountInput").value);
-  let cat = document.getElementById("categorySelect").value;
+          <div class="summary-row">
+            <div>
+              <div class="muted">Total spent</div>
+              <div id="monthTotal" class="big-number">₹0</div>
+            </div>
 
-  if(!name || !amount || !cat){ alert("Fill all fields"); return; }
+            <div class="top3-box">
+              <div class="muted">Top categories</div>
+              <div id="top3" class="top3-list"></div>
+            </div>
+          </div>
 
-  // today’s date auto
-  let today = new Date().toISOString().slice(0,10);
+          <canvas id="miniBar" height="90" style="margin-top:12px;"></canvas>
+        </div>
 
-  expenses.push({name, amount, category:cat, date:today});
-  saveAll();
-  document.getElementById("nameInput").value = "";
-  document.getElementById("amountInput").value = "";
-  renderAll();
-};
+        <!-- WALLET TRACKER -->
+        <div class="card">
+          <h2>Wallet Tracker</h2>
 
-/* ============================
-   DELETE EXPENSE
-=============================*/
-function del(idx){
-  expenses.splice(idx,1);
-  saveAll();
-  renderAll();
-}
+          <div class="wallet-row">
+            <input id="walletInput" class="wallet-input" type="number" placeholder="₹ Set wallet">
+            <button id="walletSetBtn" class="btn-set">Set</button>
+          </div>
 
-/* ============================
-   CATEGORY ADD
-=============================*/
-document.getElementById("addCategory").onclick = ()=>{
-  let x = document.getElementById("newCategory").value.trim();
-  if(!x) return;
-  if(categories.includes(x)){ alert("Already exists"); return; }
-  categories.push(x);
-  saveAll();
-  loadCategories();
-  renderCatColors();
-  document.getElementById("newCategory").value = "";
-};
+          <div class="bifurcation">
+            <div class="bif-chart">
+              <canvas id="bifChart" width="220" height="220"></canvas>
+            </div>
 
-/* ============================
-   RENDER LIST (MONTH FILTER)
-=============================*/
-function renderList(){
-  listArea.innerHTML="";
-  let prefix = new Date().toISOString().slice(0,7);  
-  let monthExp = expenses.filter(e=>e.date.startsWith(prefix));
-  monthExp.reverse().forEach((e,i)=>{
-    let idx = expenses.length - 1 - i;
-    listArea.innerHTML += `
-      <div class="expense-item">
-        <div style="display:flex;align-items:center"><div class="chip" style="background:${colorFor(e.category)}"></div>${e.name}</div>
-        <div>₹${e.amount}</div>
-        <button class="delete" onclick="del(${idx})">X</button>
-      </div>
-    `;
-  });
-}
+            <div class="bif-info">
+              <div class="bif-row">
+                <div class="bif-label"><span class="chip red"></span> Spent</div>
+                <div id="spentAmt" class="bif-value">₹0</div>
+              </div>
 
-/* ============================
-   MONTH SUMMARY + TOP 3
-=============================*/
-function renderMonthSummary(){
-  let prefix = new Date().toISOString().slice(0,7);
-  let monthExp = expenses.filter(e=>e.date.startsWith(prefix));
-  let total = monthExp.reduce((s,e)=>s+e.amount,0);
+              <div class="bif-row">
+                <div class="bif-label"><span class="chip green"></span> Left</div>
+                <div id="leftAmt" class="bif-value">₹0</div>
+              </div>
 
-  monthTotal.textContent = "₹"+total;
+              <div class="bif-row">
+                <div class="bif-label">Wallet</div>
+                <div id="walletTotal" class="bif-value">₹0</div>
+              </div>
+            </div>
+          </div>
 
-  let first = new Date();
-  first.setDate(1);
-  let last = new Date(first.getFullYear(), first.getMonth()+1, 0);
+          <div id="adviceArea" style="margin-top:12px;"></div>
+        </div>
 
-  monthRange.textContent = first.toDateString() + " - " + last.toDateString();
+        <!-- EXPENSE LIST -->
+        <div class="card">
+          <h2>Your Expenses</h2>
+          <div id="expenseList"></div>
+        </div>
+      </section>
 
-  // top 3
-  let byCat = {};
-  monthExp.forEach(e=> byCat[e.category]=(byCat[e.category]||0)+e.amount );
-  let sorted = Object.entries(byCat).sort((a,b)=>b[1]-a[1]).slice(0,3);
+      <!-- RIGHT COLUMN -->
+      <aside>
 
-  top3List.innerHTML = "";
-  sorted.forEach(([c,amt])=>{
-    top3List.innerHTML += `
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-        <span><span class="chip" style="background:${colorFor(c)}"></span> ${c}</span>
-        <b>₹${amt}</b>
-      </div>`;
-  });
-}
+        <!-- EXPORT -->
+        <div class="card">
+          <h2>Export</h2>
+          <button id="exportCsvBtn" class="btn-primary" style="width:100%">Download CSV</button>
+        </div>
 
-/* ============================
-   PIE CHART
-============================*/
-let pieChart;
-function renderPie(){
-  const ctx = document.getElementById("pieChart");
-  let prefix = new Date().toISOString().slice(0,7);
-  let monthExp = expenses.filter(e=>e.date.startsWith(prefix));
+        <!-- QUIRKY QR -->
+        <div class="card">
+          <h2>UPI QR (GenZ)</h2>
 
-  let byCat = {};
-  monthExp.forEach(e=> byCat[e.category]=(byCat[e.category]||0)+e.amount );
+          <input id="upiInput" class="input" placeholder="yourupi@bank">
+          <input id="upiName" class="input" placeholder="Name (optional)">
 
-  if(pieChart) pieChart.destroy();
+          <div class="row">
+            <button class="btn-accent" id="genQrBtn">Generate</button>
+            <button class="btn-ghost" id="regenQrBtn">Random Style</button>
+          </div>
 
-  pieChart = new Chart(ctx,{
-    type:'pie',
-    data:{
-      labels:Object.keys(byCat),
-      datasets:[{
-        data:Object.values(byCat),
-        backgroundColor:Object.keys(byCat).map(colorFor)
-      }]
-    }
-  });
-}
+          <div id="qrFrame" class="qr-frame qr-style-neon">
+            <div class="qr-emoji e1">🔥</div>
+            <div class="qr-emoji e2">✨</div>
+            <div class="qr-emoji e3">💸</div>
 
-/* ============================
-   7-DAY MINI BAR
-============================*/
-let mini;
-function renderMini(){
-  const ctx = document.getElementById("miniBar");
-  let today = new Date();
-  let days = [];
-  for(let i=6;i>=0;i--){
-    let d = new Date();
-    d.setDate(today.getDate()-i);
-    days.push(d.toISOString().slice(0,10));
-  }
+            <img id="qrImg" class="qr-img" src="" alt="QR Code">
+          </div>
+        </div>
 
-  let vals = days.map(d=> expenses.filter(e=>e.date===d).reduce((s,e)=>s+e.amount,0));
+        <!-- CATEGORY COLORS -->
+        <div class="card">
+          <h2>Categories</h2>
+          <div id="catColors"></div>
+        </div>
 
-  if(mini) mini.destroy();
+      </aside>
 
-  mini = new Chart(ctx,{
-    type:'bar',
-    data:{
-      labels:days.map(d=> new Date(d).toLocaleDateString("en-IN",{day:"numeric",month:"short"})),
-      datasets:[{data:vals,backgroundColor:"#ffd857"}]
-    },
-    options:{plugins:{legend:{display:false}}}
-  });
-}
+    </main>
+  </div>
 
-/* ============================
-   WALLET METER
-============================*/
-function renderMeter(){
-  let prefix = new Date().toISOString().slice(0,7);
-  let spent = expenses.filter(e=>e.date.startsWith(prefix)).reduce((s,e)=>s+e.amount,0);
-
-  let pct = wallet ? Math.min(100, Math.round((spent/wallet)*100)) : 0;
-
-  let meter = document.getElementById("meter");
-  let meterText = document.getElementById("meterText");
-  meter.style.setProperty("--pct", pct+"%");
-  meterText.textContent = pct+"%";
-}
-
-document.getElementById("setWallet").onclick = ()=>{
-  wallet = Number(document.getElementById("walletInput").value);
-  saveAll();
-  renderMeter();
-};
-
-/* ============================
-   CATEGORY COLORS VIEW
-============================*/
-function renderCatColors(){
-  let c = document.getElementById("catColors");
-  c.innerHTML="";
-  categories.forEach(cat=>{
-    c.innerHTML += `
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-        <div class="chip" style="background:${colorFor(cat)}"></div>${cat}
-      </div>`;
-  });
-}
-renderCatColors();
-
-/* ============================
-   AI ADVICE (simple rules)
-============================*/
-function renderAdvice(){
-  adviceArea.innerHTML="";
-
-  let prefix = new Date().toISOString().slice(0,7);
-  let monthExp = expenses.filter(e=>e.date.startsWith(prefix));
-  let byCat={};
-  monthExp.forEach(e=> byCat[e.category]=(byCat[e.category]||0)+e.amount );
-
-  let risky = (byCat["Food"]||0) + (byCat["Shopping"]||0) + (byCat["Entertainment"]||0);
-
-  if(risky>5000){
-    adviceArea.innerHTML += `<div class="advice">⚠ You’ve spent ₹${risky} on Food/Shopping/Entertainment. Try investing ₹500 into SIP instead. 🚀</div>`;
-  }
-}
-
-/* ============================
-   EXPORT CSV
-============================*/
-function exportCSV(){
-  if(!expenses.length){ alert("No data"); return; }
-
-  let csv = "date,name,category,amount\n";
-  expenses.forEach(e=>{
-    csv += `${e.date},"${e.name}",${e.category},${e.amount}\n`;
-  });
-
-  let blob = new Blob([csv],{type:"text/csv"});
-  let url = URL.createObjectURL(blob);
-  let a = document.createElement("a");
-  a.href=url; a.download="kharcha.csv"; a.click();
-}
-document.getElementById("exportCsv").onclick = exportCSV;
-document.getElementById("exportCsv2").onclick = exportCSV;
-
-/* ============================
-   UPI QR GENERATION
-============================*/
-document.getElementById("genQR").onclick = ()=>{
-  let upi = document.getElementById("upiId").value.trim();
-  let name = document.getElementById("upiName").value.trim();
-
-  if(!upi){ alert("Enter UPI"); return; }
-
-  let uri = `upi://pay?pa=${encodeURIComponent(upi)}${name ? "&pn="+name : ""}`;
-  let qrURL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(uri)}`;
-
-  document.getElementById("qrImg").src = qrURL;
-  document.getElementById("qrBox").style.display="block";
-};
-
-/* ============================
-   THEME SWITCH
-============================*/
-let theme = localStorage.getItem(LS.THEME) || "dark";
-applyTheme(theme);
-
-function applyTheme(t){
-  document.getElementById("app").setAttribute("data-theme", t);
-  localStorage.setItem(LS.THEME, t);
-}
-document.getElementById("themeBtn").onclick = ()=>{
-  theme = theme==="light" ? "dark" : "light";
-  applyTheme(theme);
-};
-
-/* ============================
-   CLEAR ALL
-============================*/
-document.getElementById("clearAll").onclick = ()=>{
-  if(confirm("Clear ALL data?")){
-    localStorage.clear();
-    expenses = [];
-    categories = [...DEFAULT_CATS];
-    wallet = 0;
-    saveAll();
-    renderAll();
-  }
-};
-
-/* ============================
-   MAIN RENDER FUNCTION
-============================*/
-function renderAll(){
-  renderList();
-  renderMonthSummary();
-  renderPie();
-  renderMini();
-  renderMeter();
-  renderAdvice();
-}
-renderAll();
-
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
