@@ -20,7 +20,7 @@
 
         <div class="title">
           <h1>Kharcha Tracker</h1>
-          <p>Tracking your daily expense so that it doesn’t hurt on the month end!</p>
+          <p>Tracking your daily expense so that it doesn’t hurt on the month end</p>
         </div>
       </div>
 
@@ -41,16 +41,14 @@
         <div class="card">
           <h2>Add Expense</h2>
 
-          <div class="row">
+          <div class="row three">
             <input id="nameInput" class="input" placeholder="Expense name">
-            <input id="amountInput" class="input-small input" type="number" placeholder="₹ Amount">
+            <input id="amountInput" class="input" type="number" placeholder="₹ Amount">
+            <select id="categorySelect" class="input"></select>
           </div>
 
-          <select id="categorySelect" class="input"></select>
-
-          <div class="row">
-            <input id="newCategory" class="input" placeholder="New Category">
-            <button class="btn-accent" id="addCategoryBtn">Add</button>
+          <div id="otherCatRow" class="hidden">
+            <input id="otherCategoryInput" class="input" placeholder="Enter custom category">
           </div>
 
           <button class="btn-primary" id="addExpenseBtn" style="margin-top:12px;">Add Expense</button>
@@ -120,34 +118,19 @@
       <!-- RIGHT COLUMN -->
       <aside>
 
-        <!-- EXPORT -->
+        <!-- SMART SUMMARY -->
         <div class="card">
-          <h2>Export</h2>
-          <button id="exportCsvBtn" class="btn-primary" style="width:100%">Download CSV</button>
+          <h2>Smart Summary</h2>
+          <div id="smartSummaryText"></div>
         </div>
 
-        <!-- QUIRKY QR -->
+        <!-- MONTHLY CATEGORY SUMMARY -->
         <div class="card">
-          <h2>UPI QR (GenZ)</h2>
-
-          <input id="upiInput" class="input" placeholder="yourupi@bank">
-          <input id="upiName" class="input" placeholder="Name (optional)">
-
-          <div class="row">
-            <button class="btn-accent" id="genQrBtn">Generate</button>
-            <button class="btn-ghost" id="regenQrBtn">Random Style</button>
-          </div>
-
-          <div id="qrFrame" class="qr-frame qr-style-neon">
-            <div class="qr-emoji e1">🔥</div>
-            <div class="qr-emoji e2">✨</div>
-            <div class="qr-emoji e3">💸</div>
-
-            <img id="qrImg" class="qr-img" src="" alt="QR Code">
-          </div>
+          <h2>Monthly Category Summary</h2>
+          <div id="categorySummary"></div>
         </div>
 
-        <!-- CATEGORY COLORS -->
+        <!-- CATEGORIES -->
         <div class="card">
           <h2>Categories</h2>
           <div id="catColors"></div>
