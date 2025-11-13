@@ -1,324 +1,562 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kharcha Tracker</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kharcha Tracker — Pro</title>
 
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root{
+    --bg1:#070707; --bg2:#1b1b1b; --card: rgba(255,255,255,0.06);
+    --accent:#ffd857; --muted: rgba(255,255,255,0.75);
+  }
 
-  <style>
-    body {
-      font-family: "Poppins", sans-serif;
-      background: linear-gradient(135deg, #000000, #1b1b1b, #2e2e2e);
-      margin: 0;
-      padding: 0;
-      color: #fff;
-    }
+  [data-theme="light"]{
+    --bg1:#f2f5fb; --bg2:#e6ebf7; --card:#fff;
+    --accent:#2b7cff; --muted:#333;
+    color:#111;
+  }
 
-    /* HEADER */
-    .header {
-      text-align: center;
-      padding: 40px 20px;
-    }
+  body{
+    margin:0; 
+    font-family:Poppins, sans-serif;
+    background:linear-gradient(180deg,var(--bg1),var(--bg2));
+    color:var(--muted);
+  }
 
-    .header h1 {
-      font-size: 42px;
-      font-weight: 700;
-      margin: 0;
-    }
+  .wrap{max-width:1000px;margin:28px auto;padding:18px;}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
 
-    .tagline {
-      margin-top: 10px;
-      font-size: 16px;
-      opacity: 0.8;
-    }
+  /* Branding */
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:56px;height:56px;background:linear-gradient(135deg,var(--accent),#ff9d57);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#111}
+  h1{margin:0;font-size:22px}
+  .tag{font-size:13px;opacity:0.8;margin-top:2px}
 
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 20px;
-    }
+  .controls{display:flex;gap:10px}
+  .tiny{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;background:rgba(255,255,255,0.06);color:var(--muted)}
 
-    /* CARD */
-    .card {
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(10px);
-      border-radius: 18px;
-      padding: 25px;
-      margin-bottom: 30px;
-      box-shadow: 0 8px 22px rgba(0,0,0,0.4);
-    }
+  /* Layout grid */
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:20px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr;}}
 
-    input, select {
-      width: 100%;
-      padding: 13px;
-      border-radius: 12px;
-      border: none;
-      font-size: 15px;
-      margin-bottom: 12px;
-    }
+  .card{
+    background:var(--card);
+    padding:20px;
+    border-radius:16px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.4);
+    margin-bottom:20px;
+  }
 
-    button {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: none;
-      font-size: 17px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: 0.3s;
-    }
+  .card h2{margin:0 0 12px;font-size:18px;font-weight:600}
 
-    .add-btn { background: #ffd857; color: #222; }
-    .add-btn:hover { background: #ffeb9d; }
+  /* Inputs */
+  input, select{
+    width:100%;padding:12px;border-radius:10px;
+    border:none;background:rgba(255,255,255,0.05);
+    color:inherit;margin-bottom:12px;
+  }
 
-    .upi-btn {
-      background: #00e5ff;
-      color: #002c3b;
-    }
-    .upi-btn:hover { background: #34f1ff; }
+  /* Buttons */
+  .btn{padding:14px;border-radius:12px;border:none;font-weight:600;cursor:pointer}
+  .add-btn{background:var(--accent);color:#111}
+  .sec-btn{background:#00e5ff;color:#003b49}
+  .ghost-btn{background:transparent;border:1px solid rgba(255,255,255,0.15)}
 
-    .summary-btn {
-      background: #ff8b4a;
-      color: #222;
-    }
-    .summary-btn:hover { background: #ffad79; }
+  /* Expense items */
+  .expense-item{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:12px;border-radius:12px;margin-bottom:10px;
+    background:rgba(255,255,255,0.08);
+  }
 
-    .expense-item {
-      display: flex;
-      justify-content: space-between;
-      background: rgba(255,255,255,0.18);
-      padding: 12px;
-      border-radius: 12px;
-      margin-bottom: 10px;
-    }
+  .chip{width:12px;height:12px;border-radius:3px;margin-right:6px}
 
-    .delete-btn {
-      background: #ff4b5c;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
-    }
+  .delete{background:#ff4b5c;color:#fff;border:none;padding:5px 9px;border-radius:8px;cursor:pointer}
 
-    .total-box {
-      text-align: center;
-      font-size: 22px;
-      font-weight: 700;
-      padding: 18px;
-      background: #ffd857;
-      color: #222;
-      border-radius: 14px;
-    }
+  /* Meter */
+  .meter{
+    width:120px;height:120px;border-radius:50%;
+    background:conic-gradient(var(--accent) var(--pct,0%),rgba(255,255,255,0.1) 0%);
+    display:grid;place-items:center;
+  }
+  .meter span{font-weight:700;color:#111;background:transparent}
 
-    canvas {
-      max-width: 350px;
-      margin: auto;
-      display: block;
-    }
+  /* Charts */
+  canvas{max-width:300px;margin:auto}
 
-    /* POPUP */
-    .popup-box {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      color: #333;
-      padding: 25px 30px;
-      border-radius: 16px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-      display: none;
-      width: 80%;
-      max-width: 350px;
-    }
-  </style>
+  /* Advice box */
+  .advice{
+    padding:14px;background:#ffe9c1;color:#333;
+    border-radius:12px;margin-top:10px;font-weight:600
+  }
 
+  /* Popup */
+  .popup{
+    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+    background:var(--card);padding:22px;border-radius:14px;
+    display:none;z-index:999;max-width:360px;width:80%;
+  }
+</style>
 </head>
 <body>
 
-  <div class="header">
-    <h1>Kharcha Tracker</h1>
-    <p class="tagline">Tracking your daily expense so that it doesn’t hurt on the month end</p>
-  </div>
+<div class="wrap" id="app" data-theme="dark">
 
-  <div class="container">
-
-    <!-- Calendar -->
-    <div class="card">
-      <h2>Select Date</h2>
-      <input type="date" id="calendarDate" onchange="filterByDate()">
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <div class="logo">KT</div>
+      <div>
+        <h1>Kharcha Tracker</h1>
+        <div class="tag">Track your monthly expenses smartly</div>
+      </div>
     </div>
 
-    <!-- INPUT -->
-    <div class="card">
-      <h2>Add Expense</h2>
-      <input type="text" id="expenseName" placeholder="Expense Name">
-      <input type="number" id="expenseAmount" placeholder="Amount (₹)">
-      <select id="expenseCategory">
-        <option value="">Select Category</option>
-        <option>Food</option>
-        <option>Shopping</option>
-        <option>Entertainment</option>
-        <option>Travel</option>
-        <option>Rent</option>
-        <option>College</option>
-        <option>Health</option>
-        <option>Other</option>
-      </select>
-      <button class="add-btn" onclick="addExpense()">Add Expense</button>
+    <div class="controls">
+      <button class="tiny" id="themeBtn">Theme</button>
+      <button class="tiny" id="exportCsv">CSV</button>
+      <button class="tiny" id="clearAll">Clear</button>
     </div>
+  </header>
 
-    <!-- TOTAL -->
-    <div class="card total-box">
-      Total Spent: ₹<span id="totalAmount">0</span>
-    </div>
+  <main class="grid">
 
-    <!-- UPI -->
-    <button class="upi-btn">🔗 Link UPI (Coming Soon)</button>
+    <!-- LEFT SIDE: EXPENSE INPUT + DASHBOARD + CHARTS + LIST -->
+    <section>
 
-    <!-- SUMMARY -->
-    <button class="summary-btn" onclick="showSummary()">📊 Summarize Expenses</button>
+      <!-- ADD EXPENSE -->
+      <div class="card">
+        <h2>Add Expense</h2>
 
-    <!-- CHART -->
-    <div class="card">
-      <h2>Expense Breakdown</h2>
-      <canvas id="pieChart"></canvas>
-    </div>
+        <!-- name + amount -->
+        <input id="nameInput" placeholder="Expense name">
+        <input id="amountInput" type="number" placeholder="Amount (₹)">
 
-    <!-- LIST -->
-    <div class="card">
-      <h2>Expenses</h2>
-      <div id="expenseList"></div>
-    </div>
+        <!-- category -->
+        <select id="categorySelect"></select>
 
-  </div>
+        <!-- add custom category -->
+        <div style="display:flex;gap:10px">
+          <input id="newCategory" placeholder="New category">
+          <button class="sec-btn btn" id="addCategory">Add</button>
+        </div>
 
-  <!-- POPUP -->
-  <div id="popup" class="popup-box"></div>
+        <button class="add-btn btn" id="addExpense">Add Expense</button>
+      </div>
 
-  <script>
-    let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
-    let chart;
+      <!-- MONTH SUMMARY -->
+      <div class="card">
+        <h2>This Month</h2>
+        <h3 id="monthTotal" style="margin:0;font-size:26px">₹0</h3>
+        <div id="monthRange" style="opacity:0.8;font-size:13px;margin-top:4px"></div>
 
-    function addExpense() {
-      const name = document.getElementById("expenseName").value;
-      const amount = Number(document.getElementById("expenseAmount").value);
-      const category = document.getElementById("expenseCategory").value;
-      const date = document.getElementById("calendarDate").value || new Date().toISOString().split("T")[0];
+        <!-- Top 3 categories -->
+        <h3 style="margin-top:18px">Top Categories</h3>
+        <div id="top3List"></div>
 
-      if (!name || !amount || !category) {
-        alert("Fill all fields!");
-        return;
-      }
+        <!-- 7-Day bar chart -->
+        <canvas id="miniBar" height="140"></canvas>
 
-      expenses.push({ name, amount, category, date });
-      localStorage.setItem("expenses", JSON.stringify(expenses));
+        <!-- Wallet -->
+        <h3 style="margin-top:20px">Wallet</h3>
+        <div style="display:flex;gap:10px;margin-bottom:14px">
+          <input id="walletInput" placeholder="Wallet amount" type="number">
+          <button class="ghost-btn btn" id="setWallet">Set</button>
+        </div>
 
-      document.getElementById("expenseName").value = "";
-      document.getElementById("expenseAmount").value = "";
-      document.getElementById("expenseCategory").value = "";
+        <div class="meter" id="meter"><span id="meterText">0%</span></div>
+      </div>
 
-      updateUI();
+      <!-- PIE CHART + AI ADVICE -->
+      <div class="card">
+        <h2>Category Breakdown</h2>
+        <canvas id="pieChart"></canvas>
+        <div id="adviceArea"></div>
+      </div>
+
+      <!-- EXPENSE LIST -->
+      <div class="card">
+        <h2>Your Expenses (Month-wise)</h2>
+        <div id="listArea"></div>
+      </div>
+
+    </section>
+
+    <!-- RIGHT SIDE: QR + CATEGORY COLORS + EXPORT -->
+    <aside>
+
+      <!-- EXPORT TOOLS -->
+      <div class="card">
+        <h2>Export</h2>
+        <button class="btn add-btn" id="exportCsv2">Download CSV</button>
+      </div>
+
+      <!-- UPI QR GENERATOR -->
+      <div class="card">
+        <h2>UPI QR (GenZ Style)</h2>
+
+        <input id="upiId" placeholder="yourupi@bank">
+        <input id="upiName" placeholder="Name (optional)">
+        <button class="sec-btn btn" id="genQR">Generate QR</button>
+
+        <div id="qrBox" style="margin-top:14px;display:none">
+          <img id="qrImg" width="170" style="border-radius:10px">
+        </div>
+      </div>
+
+      <!-- CATEGORY COLORS -->
+      <div class="card">
+        <h2>Category Colors</h2>
+        <div id="catColors"></div>
+      </div>
+
+    </aside>
+
+  </main>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<script>
+/* ============================
+   BASIC STORAGE + CONSTANTS
+=============================*/
+const LS = { EXP:"kt_exp", CAT:"kt_cat", WAL:"kt_wal", THEME:"kt_theme" };
+const DEFAULT_CATS = ["Food","Shopping","Entertainment","Travel","Rent","College","Health","Other"];
+let expenses = JSON.parse(localStorage.getItem(LS.EXP) || "[]");
+let categories = JSON.parse(localStorage.getItem(LS.CAT) || JSON.stringify(DEFAULT_CATS));
+let wallet = Number(localStorage.getItem(LS.WAL) || 0);
+
+/* ============================
+   BASIC UI ELEMENTS
+=============================*/
+const catSelect = document.getElementById("categorySelect");
+const listArea = document.getElementById("listArea");
+const top3List = document.getElementById("top3List");
+const monthTotal = document.getElementById("monthTotal");
+const monthRange = document.getElementById("monthRange");
+const adviceArea = document.getElementById("adviceArea");
+
+/* ============================
+   CATEGORY COLORS
+=============================*/
+const CAT_COLORS = {
+  "Food":"#ffd857","Shopping":"#ff7ab6","Entertainment":"#b37bff",
+  "Travel":"#57c7ff","Rent":"#8ee5a1","College":"#ffd2a8",
+  "Health":"#ff9b4a","Other":"#c9c9c9"
+};
+function colorFor(cat){
+  return CAT_COLORS[cat] || randomColor(cat);
+}
+function randomColor(cat){
+  let h = 0; for(let i=0;i<cat.length;i++) h = cat.charCodeAt(i)+((h<<5)-h);
+  return "#"+((h>>24)&0xFF).toString(16).padStart(2,0)+((h>>16)&0xFF).toString(16).padStart(2,0)+((h>>8)&0xFF).toString(16).padStart(2,0);
+}
+
+/* ============================
+   POPULATE CATEGORY SELECTOR
+=============================*/
+function loadCategories(){
+  catSelect.innerHTML = "<option value=''>Select Category</option>";
+  categories.forEach(c=>{
+    let o = document.createElement("option");
+    o.value = o.textContent = c;
+    catSelect.appendChild(o);
+  });
+}
+loadCategories();
+
+/* ============================
+   SAVE TO LOCAL STORAGE
+=============================*/
+function saveAll(){
+  localStorage.setItem(LS.EXP, JSON.stringify(expenses));
+  localStorage.setItem(LS.CAT, JSON.stringify(categories));
+  localStorage.setItem(LS.WAL, wallet);
+}
+
+/* ============================
+   ADD EXPENSE (MONTH-WISE)
+=============================*/
+document.getElementById("addExpense").onclick = ()=>{
+  let name = document.getElementById("nameInput").value.trim();
+  let amount = Number(document.getElementById("amountInput").value);
+  let cat = document.getElementById("categorySelect").value;
+
+  if(!name || !amount || !cat){ alert("Fill all fields"); return; }
+
+  // today’s date auto
+  let today = new Date().toISOString().slice(0,10);
+
+  expenses.push({name, amount, category:cat, date:today});
+  saveAll();
+  document.getElementById("nameInput").value = "";
+  document.getElementById("amountInput").value = "";
+  renderAll();
+};
+
+/* ============================
+   DELETE EXPENSE
+=============================*/
+function del(idx){
+  expenses.splice(idx,1);
+  saveAll();
+  renderAll();
+}
+
+/* ============================
+   CATEGORY ADD
+=============================*/
+document.getElementById("addCategory").onclick = ()=>{
+  let x = document.getElementById("newCategory").value.trim();
+  if(!x) return;
+  if(categories.includes(x)){ alert("Already exists"); return; }
+  categories.push(x);
+  saveAll();
+  loadCategories();
+  renderCatColors();
+  document.getElementById("newCategory").value = "";
+};
+
+/* ============================
+   RENDER LIST (MONTH FILTER)
+=============================*/
+function renderList(){
+  listArea.innerHTML="";
+  let prefix = new Date().toISOString().slice(0,7);  
+  let monthExp = expenses.filter(e=>e.date.startsWith(prefix));
+  monthExp.reverse().forEach((e,i)=>{
+    let idx = expenses.length - 1 - i;
+    listArea.innerHTML += `
+      <div class="expense-item">
+        <div style="display:flex;align-items:center"><div class="chip" style="background:${colorFor(e.category)}"></div>${e.name}</div>
+        <div>₹${e.amount}</div>
+        <button class="delete" onclick="del(${idx})">X</button>
+      </div>
+    `;
+  });
+}
+
+/* ============================
+   MONTH SUMMARY + TOP 3
+=============================*/
+function renderMonthSummary(){
+  let prefix = new Date().toISOString().slice(0,7);
+  let monthExp = expenses.filter(e=>e.date.startsWith(prefix));
+  let total = monthExp.reduce((s,e)=>s+e.amount,0);
+
+  monthTotal.textContent = "₹"+total;
+
+  let first = new Date();
+  first.setDate(1);
+  let last = new Date(first.getFullYear(), first.getMonth()+1, 0);
+
+  monthRange.textContent = first.toDateString() + " - " + last.toDateString();
+
+  // top 3
+  let byCat = {};
+  monthExp.forEach(e=> byCat[e.category]=(byCat[e.category]||0)+e.amount );
+  let sorted = Object.entries(byCat).sort((a,b)=>b[1]-a[1]).slice(0,3);
+
+  top3List.innerHTML = "";
+  sorted.forEach(([c,amt])=>{
+    top3List.innerHTML += `
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span><span class="chip" style="background:${colorFor(c)}"></span> ${c}</span>
+        <b>₹${amt}</b>
+      </div>`;
+  });
+}
+
+/* ============================
+   PIE CHART
+============================*/
+let pieChart;
+function renderPie(){
+  const ctx = document.getElementById("pieChart");
+  let prefix = new Date().toISOString().slice(0,7);
+  let monthExp = expenses.filter(e=>e.date.startsWith(prefix));
+
+  let byCat = {};
+  monthExp.forEach(e=> byCat[e.category]=(byCat[e.category]||0)+e.amount );
+
+  if(pieChart) pieChart.destroy();
+
+  pieChart = new Chart(ctx,{
+    type:'pie',
+    data:{
+      labels:Object.keys(byCat),
+      datasets:[{
+        data:Object.values(byCat),
+        backgroundColor:Object.keys(byCat).map(colorFor)
+      }]
     }
+  });
+}
 
-    function deleteExpense(i) {
-      expenses.splice(i, 1);
-      localStorage.setItem("expenses", JSON.stringify(expenses));
-      updateUI();
-    }
+/* ============================
+   7-DAY MINI BAR
+============================*/
+let mini;
+function renderMini(){
+  const ctx = document.getElementById("miniBar");
+  let today = new Date();
+  let days = [];
+  for(let i=6;i>=0;i--){
+    let d = new Date();
+    d.setDate(today.getDate()-i);
+    days.push(d.toISOString().slice(0,10));
+  }
 
-    function filterByDate() {
-      updateUI();
-    }
+  let vals = days.map(d=> expenses.filter(e=>e.date===d).reduce((s,e)=>s+e.amount,0));
 
-    function updateUI() {
-      const list = document.getElementById("expenseList");
-      const totalAmount = document.getElementById("totalAmount");
-      const selectedDate = document.getElementById("calendarDate").value;
+  if(mini) mini.destroy();
 
-      list.innerHTML = "";
-      let total = 0;
+  mini = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:days.map(d=> new Date(d).toLocaleDateString("en-IN",{day:"numeric",month:"short"})),
+      datasets:[{data:vals,backgroundColor:"#ffd857"}]
+    },
+    options:{plugins:{legend:{display:false}}}
+  });
+}
 
-      expenses.forEach((exp, index) => {
-        if (!selectedDate || exp.date === selectedDate) {
-          total += exp.amount;
+/* ============================
+   WALLET METER
+============================*/
+function renderMeter(){
+  let prefix = new Date().toISOString().slice(0,7);
+  let spent = expenses.filter(e=>e.date.startsWith(prefix)).reduce((s,e)=>s+e.amount,0);
 
-          let div = document.createElement("div");
-          div.className = "expense-item";
-          div.innerHTML = `
-            <strong>${exp.name}</strong>
-            <span>₹${exp.amount} | ${exp.category} | ${exp.date}</span>
-            <button class="delete-btn" onclick="deleteExpense(${index})">X</button>
-          `;
-          list.appendChild(div);
-        }
-      });
+  let pct = wallet ? Math.min(100, Math.round((spent/wallet)*100)) : 0;
 
-      totalAmount.textContent = total;
-      updateChart();
-    }
+  let meter = document.getElementById("meter");
+  let meterText = document.getElementById("meterText");
+  meter.style.setProperty("--pct", pct+"%");
+  meterText.textContent = pct+"%";
+}
 
-    function updateChart() {
-      const ctx = document.getElementById("pieChart").getContext("2d");
+document.getElementById("setWallet").onclick = ()=>{
+  wallet = Number(document.getElementById("walletInput").value);
+  saveAll();
+  renderMeter();
+};
 
-      const categoryTotals = {};
-      expenses.forEach(exp => {
-        categoryTotals[exp.category] = (categoryTotals[exp.category] || 0) + exp.amount;
-      });
+/* ============================
+   CATEGORY COLORS VIEW
+============================*/
+function renderCatColors(){
+  let c = document.getElementById("catColors");
+  c.innerHTML="";
+  categories.forEach(cat=>{
+    c.innerHTML += `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <div class="chip" style="background:${colorFor(cat)}"></div>${cat}
+      </div>`;
+  });
+}
+renderCatColors();
 
-      if (chart) chart.destroy();
+/* ============================
+   AI ADVICE (simple rules)
+============================*/
+function renderAdvice(){
+  adviceArea.innerHTML="";
 
-      chart = new Chart(ctx, {
-        type: "pie",
-        data: {
-          labels: Object.keys(categoryTotals),
-          datasets: [{ data: Object.values(categoryTotals) }]
-        }
-      });
-    }
+  let prefix = new Date().toISOString().slice(0,7);
+  let monthExp = expenses.filter(e=>e.date.startsWith(prefix));
+  let byCat={};
+  monthExp.forEach(e=> byCat[e.category]=(byCat[e.category]||0)+e.amount );
 
-    function showSummary() {
-      let food = 0, shopping = 0, entertainment = 0, total = 0;
+  let risky = (byCat["Food"]||0) + (byCat["Shopping"]||0) + (byCat["Entertainment"]||0);
 
-      expenses.forEach(exp => {
-        total += exp.amount;
-        if (exp.category === "Food") food += exp.amount;
-        if (exp.category === "Shopping") shopping += exp.amount;
-        if (exp.category === "Entertainment") entertainment += exp.amount;
-      });
+  if(risky>5000){
+    adviceArea.innerHTML += `<div class="advice">⚠ You’ve spent ₹${risky} on Food/Shopping/Entertainment. Try investing ₹500 into SIP instead. 🚀</div>`;
+  }
+}
 
-      const risky = food + shopping + entertainment;
+/* ============================
+   EXPORT CSV
+============================*/
+function exportCSV(){
+  if(!expenses.length){ alert("No data"); return; }
 
-      let msg = `
-        Total Monthly Spend: ₹${total} <br><br>
-        Food: ₹${food} <br>
-        Shopping: ₹${shopping} <br>
-        Entertainment: ₹${entertainment} <br><br>
-      `;
+  let csv = "date,name,category,amount\n";
+  expenses.forEach(e=>{
+    csv += `${e.date},"${e.name}",${e.category},${e.amount}\n`;
+  });
 
-      if (risky > 5000) {
-        msg += `<b style='color:red;'>⚠ You spent over ₹5000 this month on Food/Shopping/Entertainment!  
-        Start investing even ₹500 daily into SIP instead of overspending. Your future self will thank you. 🚀</b>`;
-      }
+  let blob = new Blob([csv],{type:"text/csv"});
+  let url = URL.createObjectURL(blob);
+  let a = document.createElement("a");
+  a.href=url; a.download="kharcha.csv"; a.click();
+}
+document.getElementById("exportCsv").onclick = exportCSV;
+document.getElementById("exportCsv2").onclick = exportCSV;
 
-      const popup = document.getElementById("popup");
-      popup.innerHTML = msg;
-      popup.style.display = "block";
+/* ============================
+   UPI QR GENERATION
+============================*/
+document.getElementById("genQR").onclick = ()=>{
+  let upi = document.getElementById("upiId").value.trim();
+  let name = document.getElementById("upiName").value.trim();
 
-      setTimeout(() => popup.style.display = "none", 4000);
-    }
+  if(!upi){ alert("Enter UPI"); return; }
 
-    updateUI();
-  </script>
+  let uri = `upi://pay?pa=${encodeURIComponent(upi)}${name ? "&pn="+name : ""}`;
+  let qrURL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(uri)}`;
+
+  document.getElementById("qrImg").src = qrURL;
+  document.getElementById("qrBox").style.display="block";
+};
+
+/* ============================
+   THEME SWITCH
+============================*/
+let theme = localStorage.getItem(LS.THEME) || "dark";
+applyTheme(theme);
+
+function applyTheme(t){
+  document.getElementById("app").setAttribute("data-theme", t);
+  localStorage.setItem(LS.THEME, t);
+}
+document.getElementById("themeBtn").onclick = ()=>{
+  theme = theme==="light" ? "dark" : "light";
+  applyTheme(theme);
+};
+
+/* ============================
+   CLEAR ALL
+============================*/
+document.getElementById("clearAll").onclick = ()=>{
+  if(confirm("Clear ALL data?")){
+    localStorage.clear();
+    expenses = [];
+    categories = [...DEFAULT_CATS];
+    wallet = 0;
+    saveAll();
+    renderAll();
+  }
+};
+
+/* ============================
+   MAIN RENDER FUNCTION
+============================*/
+function renderAll(){
+  renderList();
+  renderMonthSummary();
+  renderPie();
+  renderMini();
+  renderMeter();
+  renderAdvice();
+}
+renderAll();
+
+</script>
 
 </body>
 </html>
