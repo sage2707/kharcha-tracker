@@ -14,16 +14,10 @@
   <style>
     body {
       font-family: "Poppins", sans-serif;
-      background: linear-gradient(135deg, #4e54c8, #8f94fb);
+      background: linear-gradient(135deg, #000000, #1b1b1b, #2e2e2e);
       margin: 0;
       padding: 0;
       color: #fff;
-      animation: fadeIn 1s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0px); }
     }
 
     /* HEADER */
@@ -33,15 +27,15 @@
     }
 
     .header h1 {
-      font-size: 48px;
+      font-size: 42px;
       font-weight: 700;
       margin: 0;
     }
 
     .tagline {
       margin-top: 10px;
-      font-size: 17px;
-      opacity: 0.9;
+      font-size: 16px;
+      opacity: 0.8;
     }
 
     .container {
@@ -52,126 +46,103 @@
 
     /* CARD */
     .card {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
       border-radius: 18px;
       padding: 25px;
       margin-bottom: 30px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-    }
-
-    /* INPUT ROW */
-    .form-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.4);
     }
 
     input, select {
       width: 100%;
-      padding: 14px;
+      padding: 13px;
       border-radius: 12px;
       border: none;
-      outline: none;
-      font-size: 16px;
+      font-size: 15px;
+      margin-bottom: 12px;
     }
 
-    /* BUTTONS */
     button {
       width: 100%;
       padding: 14px;
       border-radius: 12px;
       border: none;
-      background: #ffd857;
-      color: #333;
+      font-size: 17px;
       font-weight: 600;
       cursor: pointer;
-      font-size: 17px;
+      margin-top: 10px;
       transition: 0.3s;
     }
 
-    button:hover {
-      background: #ffe58d;
-      transform: translateY(-2px);
-    }
+    .add-btn { background: #ffd857; color: #222; }
+    .add-btn:hover { background: #ffeb9d; }
 
-    /* EXPENSE ITEM */
+    .upi-btn {
+      background: #00e5ff;
+      color: #002c3b;
+    }
+    .upi-btn:hover { background: #34f1ff; }
+
+    .summary-btn {
+      background: #ff8b4a;
+      color: #222;
+    }
+    .summary-btn:hover { background: #ffad79; }
+
     .expense-item {
       display: flex;
       justify-content: space-between;
-      background: rgba(255,255,255,0.2);
-      padding: 14px;
-      border-radius: 14px;
+      background: rgba(255,255,255,0.18);
+      padding: 12px;
+      border-radius: 12px;
       margin-bottom: 10px;
     }
 
     .delete-btn {
       background: #ff4b5c;
-      padding: 6px 10px;
-      border-radius: 6px;
-      color: white;
       border: none;
+      padding: 6px 10px;
+      border-radius: 8px;
+      color: white;
       cursor: pointer;
     }
 
-    /* TOTAL BOX */
     .total-box {
       text-align: center;
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
-      padding: 20px;
+      padding: 18px;
       background: #ffd857;
-      color: #333;
+      color: #222;
       border-radius: 14px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
     }
 
-    /* UPI LINK BUTTON */
-    .upi-link-btn {
-      background: #00e5ff;
-      color: #003c57;
-      padding: 16px;
-      border-radius: 14px;
-      border: none;
-      font-size: 18px;
-      font-weight: 600;
-      cursor: pointer;
-      width: 100%;
-      margin-bottom: 20px;
-      transition: 0.3s;
-      box-shadow: 0 4px 15px rgba(0, 229, 255, 0.4);
-    }
-
-    .upi-link-btn:hover {
-      background: #34f1ff;
-      transform: scale(1.03);
+    canvas {
+      max-width: 350px;
+      margin: auto;
+      display: block;
     }
 
     /* POPUP */
-    .upi-coming-popup {
+    .popup-box {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: white;
       color: #333;
-      padding: 25px 35px;
+      padding: 25px 30px;
       border-radius: 16px;
       text-align: center;
       box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-      font-size: 18px;
-      font-weight: 600;
       display: none;
-      animation: popIn 0.4s ease;
-    }
-
-    @keyframes popIn {
-      0% { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
-      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      width: 80%;
+      max-width: 350px;
     }
   </style>
-</head>
 
+</head>
 <body>
 
   <div class="header">
@@ -181,27 +152,29 @@
 
   <div class="container">
 
-    <!-- INPUT CARD -->
+    <!-- Calendar -->
     <div class="card">
-      <h2>Add New Expense</h2>
-      <div class="form-row">
-        <input type="text" id="expenseName" placeholder="Expense Name">
-        <input type="number" id="expenseAmount" placeholder="Amount (₹)">
-        
-        <select id="expenseCategory">
-          <option value="">Select Category</option>
-          <option>Food</option>
-          <option>Travel</option>
-          <option>Rent</option>
-          <option>Shopping</option>
-          <option>Health</option>
-          <option>College</option>
-          <option>Entertainment</option>
-          <option>Other</option>
-        </select>
+      <h2>Select Date</h2>
+      <input type="date" id="calendarDate" onchange="filterByDate()">
+    </div>
 
-        <button onclick="addExpense()">Add Expense</button>
-      </div>
+    <!-- INPUT -->
+    <div class="card">
+      <h2>Add Expense</h2>
+      <input type="text" id="expenseName" placeholder="Expense Name">
+      <input type="number" id="expenseAmount" placeholder="Amount (₹)">
+      <select id="expenseCategory">
+        <option value="">Select Category</option>
+        <option>Food</option>
+        <option>Shopping</option>
+        <option>Entertainment</option>
+        <option>Travel</option>
+        <option>Rent</option>
+        <option>College</option>
+        <option>Health</option>
+        <option>Other</option>
+      </select>
+      <button class="add-btn" onclick="addExpense()">Add Expense</button>
     </div>
 
     <!-- TOTAL -->
@@ -209,41 +182,90 @@
       Total Spent: ₹<span id="totalAmount">0</span>
     </div>
 
-    <!-- UPI BUTTON -->
-    <button class="upi-link-btn">🔗 Link UPI (Coming Soon 😎📱💸)</button>
+    <!-- UPI -->
+    <button class="upi-btn">🔗 Link UPI (Coming Soon)</button>
 
-    <!-- PIE CHART -->
+    <!-- SUMMARY -->
+    <button class="summary-btn" onclick="showSummary()">📊 Summarize Expenses</button>
+
+    <!-- CHART -->
     <div class="card">
       <h2>Expense Breakdown</h2>
       <canvas id="pieChart"></canvas>
     </div>
 
-    <!-- EXPENSE LIST -->
+    <!-- LIST -->
     <div class="card">
-      <h2>All Expenses</h2>
+      <h2>Expenses</h2>
       <div id="expenseList"></div>
     </div>
 
   </div>
 
   <!-- POPUP -->
-  <div id="upiPopup" class="upi-coming-popup">
-    🔒 UPI Linking Feature Coming Soon 🚀💸  
-  </div>
+  <div id="popup" class="popup-box"></div>
 
   <script>
     let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
     let chart;
 
-    // POPUP for UPI button
-    document.querySelector(".upi-link-btn").addEventListener("click", () => {
-      const popup = document.getElementById("upiPopup");
-      popup.style.display = "block";
+    function addExpense() {
+      const name = document.getElementById("expenseName").value;
+      const amount = Number(document.getElementById("expenseAmount").value);
+      const category = document.getElementById("expenseCategory").value;
+      const date = document.getElementById("calendarDate").value || new Date().toISOString().split("T")[0];
 
-      setTimeout(() => {
-        popup.style.display = "none";
-      }, 1800);
-    });
+      if (!name || !amount || !category) {
+        alert("Fill all fields!");
+        return;
+      }
+
+      expenses.push({ name, amount, category, date });
+      localStorage.setItem("expenses", JSON.stringify(expenses));
+
+      document.getElementById("expenseName").value = "";
+      document.getElementById("expenseAmount").value = "";
+      document.getElementById("expenseCategory").value = "";
+
+      updateUI();
+    }
+
+    function deleteExpense(i) {
+      expenses.splice(i, 1);
+      localStorage.setItem("expenses", JSON.stringify(expenses));
+      updateUI();
+    }
+
+    function filterByDate() {
+      updateUI();
+    }
+
+    function updateUI() {
+      const list = document.getElementById("expenseList");
+      const totalAmount = document.getElementById("totalAmount");
+      const selectedDate = document.getElementById("calendarDate").value;
+
+      list.innerHTML = "";
+      let total = 0;
+
+      expenses.forEach((exp, index) => {
+        if (!selectedDate || exp.date === selectedDate) {
+          total += exp.amount;
+
+          let div = document.createElement("div");
+          div.className = "expense-item";
+          div.innerHTML = `
+            <strong>${exp.name}</strong>
+            <span>₹${exp.amount} | ${exp.category} | ${exp.date}</span>
+            <button class="delete-btn" onclick="deleteExpense(${index})">X</button>
+          `;
+          list.appendChild(div);
+        }
+      });
+
+      totalAmount.textContent = total;
+      updateChart();
+    }
 
     function updateChart() {
       const ctx = document.getElementById("pieChart").getContext("2d");
@@ -253,69 +275,46 @@
         categoryTotals[exp.category] = (categoryTotals[exp.category] || 0) + exp.amount;
       });
 
-      const labels = Object.keys(categoryTotals);
-      const data = Object.values(categoryTotals);
-
       if (chart) chart.destroy();
 
       chart = new Chart(ctx, {
         type: "pie",
         data: {
-          labels: labels,
-          datasets: [{
-            data: data
-          }]
+          labels: Object.keys(categoryTotals),
+          datasets: [{ data: Object.values(categoryTotals) }]
         }
       });
     }
 
-    function updateUI() {
-      const list = document.getElementById("expenseList");
-      const totalAmount = document.getElementById("totalAmount");
+    function showSummary() {
+      let food = 0, shopping = 0, entertainment = 0, total = 0;
 
-      list.innerHTML = "";
-      let total = 0;
-
-      expenses.forEach((exp, index) => {
+      expenses.forEach(exp => {
         total += exp.amount;
-
-        const div = document.createElement("div");
-        div.className = "expense-item";
-        div.innerHTML = `
-          <strong>${exp.name}</strong> 
-          <span>₹${exp.amount} | ${exp.category}</span>
-          <button class="delete-btn" onclick="deleteExpense(${index})">X</button>
-        `;
-        list.appendChild(div);
+        if (exp.category === "Food") food += exp.amount;
+        if (exp.category === "Shopping") shopping += exp.amount;
+        if (exp.category === "Entertainment") entertainment += exp.amount;
       });
 
-      totalAmount.textContent = total;
-      localStorage.setItem("expenses", JSON.stringify(expenses));
-      updateChart();
-    }
+      const risky = food + shopping + entertainment;
 
-    function addExpense() {
-      const name = document.getElementById("expenseName").value;
-      const amount = Number(document.getElementById("expenseAmount").value);
-      const category = document.getElementById("expenseCategory").value;
+      let msg = `
+        Total Monthly Spend: ₹${total} <br><br>
+        Food: ₹${food} <br>
+        Shopping: ₹${shopping} <br>
+        Entertainment: ₹${entertainment} <br><br>
+      `;
 
-      if (!name || !amount || !category) {
-        alert("Please fill all fields!");
-        return;
+      if (risky > 5000) {
+        msg += `<b style='color:red;'>⚠ You spent over ₹5000 this month on Food/Shopping/Entertainment!  
+        Start investing even ₹500 daily into SIP instead of overspending. Your future self will thank you. 🚀</b>`;
       }
 
-      expenses.push({ name, amount, category });
+      const popup = document.getElementById("popup");
+      popup.innerHTML = msg;
+      popup.style.display = "block";
 
-      document.getElementById("expenseName").value = "";
-      document.getElementById("expenseAmount").value = "";
-      document.getElementById("expenseCategory").value = "";
-
-      updateUI();
-    }
-
-    function deleteExpense(index) {
-      expenses.splice(index, 1);
-      updateUI();
+      setTimeout(() => popup.style.display = "none", 4000);
     }
 
     updateUI();
