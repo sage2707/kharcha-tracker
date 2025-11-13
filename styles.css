@@ -1,32 +1,46 @@
+/* =====================================================
+   GLOBAL VARIABLES – DARK & LIGHT THEME
+===================================================== */
+
 :root {
   --bg-1: #050505;
   --bg-2: #141414;
+
+  --text: #ffffff;
+  --muted: #bfbfbf;
+
   --card: rgba(255,255,255,0.04);
+
   --accent: #ffd857;
   --accent-dark: #e6c548;
-  --muted: #cfcfcf;
-  --white: #ffffff;
+
   --danger: #ff5b5b;
   --success: #30d158;
 }
 
 [data-theme="light"] {
-  --bg-1: #f6f8fb;
-  --bg-2: #eef3fb;
+  --bg-1: #f5f7fb;
+  --bg-2: #ffffff;
+
+  --text: #111111;
+  --muted: #555555;
+
   --card: #ffffff;
-  --muted: #333;
-  --white: #111;
 }
 
-/* BODY */
-* { box-sizing: border-box; }
+/* =====================================================
+   GLOBAL STYLES
+===================================================== */
 
 body {
   margin: 0;
-  font-family: Poppins, sans-serif;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
   background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
-  color: var(--white);
+  color: var(--text);
 }
+
+* { box-sizing: border-box; }
 
 .wrap {
   max-width: 1100px;
@@ -34,7 +48,10 @@ body {
   padding: 20px;
 }
 
-/* HEADER */
+/* =====================================================
+   HEADER
+===================================================== */
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -48,24 +65,22 @@ body {
   gap: 16px;
 }
 
-/* USER LOGO (minimal dark theme) */
 .logo-image {
   width: 68px;
   height: 68px;
   border-radius: 14px;
-  object-fit: contain;
+  object-fit: cover;
 }
 
-/* TITLE + SUBTITLE */
 .title h1 {
   margin: 0;
   font-size: 28px;
-  font-weight: 700;
+  color: var(--text);
 }
 
 .title p {
   margin: 6px 0 0 0;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--muted);
 }
 
@@ -77,17 +92,20 @@ body {
 .btn-small {
   padding: 8px 12px;
   border-radius: 10px;
-  background: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.09);
   border: none;
-  color: var(--white);
-  cursor: pointer;
+  color: var(--text);
   font-weight: 600;
+  cursor: pointer;
 }
 
-/* GRID */
+/* =====================================================
+   GRID LAYOUT
+===================================================== */
+
 .grid {
   display: grid;
-  grid-template-columns: 1fr 360px;
+  grid-template-columns: 1fr 350px;
   gap: 20px;
 }
 
@@ -97,35 +115,38 @@ body {
   }
 }
 
-/* CARD */
+/* =====================================================
+   CARD
+===================================================== */
+
 .card {
   background: var(--card);
   padding: 18px;
-  border-radius: 14px;
-  box-shadow: 0 8px 28px rgba(0,0,0,0.6);
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.4);
   margin-bottom: 20px;
 }
 
 .card h2 {
   margin: 0 0 12px 0;
   font-size: 18px;
+  color: var(--text);
 }
 
-/* INPUTS */
+/* =====================================================
+   INPUTS & BUTTONS
+===================================================== */
+
 .input,
-input,
-select {
+select,
+input {
   width: 100%;
   background: rgba(255,255,255,0.06);
   border: none;
   padding: 12px 14px;
   border-radius: 10px;
-  color: var(--white);
+  color: var(--text);
   font-size: 14px;
-}
-
-.input-small {
-  width: 140px;
 }
 
 .row {
@@ -133,68 +154,72 @@ select {
   gap: 12px;
 }
 
-/* BUTTONS */
+.row.three input,
+.row.three select {
+  flex: 1;
+}
+
 .btn-primary {
   width: 100%;
   padding: 12px 16px;
   border-radius: 12px;
+  border: none;
   background: var(--accent);
   color: #111;
-  border: none;
   font-weight: 700;
   cursor: pointer;
 }
 
-.btn-accent {
-  padding: 12px 16px;
-  background: #00e6ff;
-  border-radius: 12px;
-  color: #00343a;
-  font-weight: 700;
+.btn-set {
+  padding: 12px 14px;
+  background: var(--accent);
   border: none;
+  border-radius: 10px;
+  color: #111;
+  font-weight: 700;
   cursor: pointer;
 }
 
 .btn-ghost {
-  padding: 12px 14px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.08);
+  border: none;
   border-radius: 10px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.10);
-  color: var(--white);
+  color: var(--text);
   cursor: pointer;
 }
+
+/* =====================================================
+   SUMMARY + TOP 3
+===================================================== */
 
 .big-number {
   font-size: 28px;
   font-weight: 700;
+  color: var(--text);
 }
 
 .muted {
   color: var(--muted);
 }
 
-/* TOP 3 */
 .top3-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
-.summary-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-}
+/* =====================================================
+   EXPENSE LIST
+===================================================== */
 
-/* EXPENSE LIST */
 .expense-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: rgba(255,255,255,0.06);
   padding: 12px;
-  border-radius: 10px;
+  border-radius: 12px;
   margin-bottom: 10px;
 }
 
@@ -213,7 +238,10 @@ select {
 .red { background: var(--danger); }
 .green { background: var(--success); }
 
-/* WALLET TRACKER */
+/* =====================================================
+   WALLET TRACKER
+===================================================== */
+
 .wallet-row {
   display: flex;
   gap: 10px;
@@ -221,32 +249,19 @@ select {
 }
 
 .wallet-input {
-  width: 100%;
+  flex: 1;
+  background: rgba(255,255,255,0.06);
   padding: 12px;
   border-radius: 10px;
   border: none;
-  background: rgba(255,255,255,0.06);
-  color: var(--white);
+  color: var(--text);
 }
 
-.btn-set {
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: var(--accent);
-  color: #111;
-  font-weight: 700;
-  cursor: pointer;
-}
-
+/* Donut Chart & Info */
 .bifurcation {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
-}
-
-.bif-chart {
-  width: 220px;
-  height: 220px;
 }
 
 .bif-info {
@@ -266,71 +281,46 @@ select {
 .bif-label {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .bif-value {
   font-size: 18px;
   font-weight: 700;
+  color: var(--text);
 }
 
-/* QR SECTION */
-.qr-frame {
-  margin-top: 14px;
-  width: 200px;
-  height: 200px;
-  padding: 14px;
-  border-radius: 16px;
-  display: grid;
-  place-items: center;
-  position: relative;
-}
+/* =====================================================
+   SMART SUMMARY + MONTHLY SUMMARY
+===================================================== */
 
-/* QUIRKY STYLES */
-.qr-style-neon {
-  background: linear-gradient(135deg,#0ff,#7b3cff);
-  box-shadow: 0 0 30px rgba(123,60,255,0.4);
-}
-
-.qr-style-pastel {
-  background: linear-gradient(135deg,#ffe6f2,#d7d6ff);
-}
-
-.qr-style-gradient {
-  background: linear-gradient(135deg,#ff7ab6,#ffd857);
-}
-
-.qr-style-sticker {
-  background: #fff;
-  transform: rotate(-1deg);
-}
-
-.qr-style-emoji {
-  background: linear-gradient(135deg,#ffd857,#ff9957);
-}
-
-/* QR image */
-.qr-img {
-  width: 160px;
-  height: 160px;
-  border-radius: 12px;
-}
-
-/* Emoji positions */
-.qr-emoji {
-  position: absolute;
-  font-size: 20px;
-}
-
-.e1 { top: -10px; left: 10px; }
-.e2 { bottom: -12px; right: 10px; }
-.e3 { bottom: 10px; left: 10px; }
-
-/* ADVICE */
-.advice {
-  background: #ffeec2;
-  color: #333;
+.summary-warning {
   padding: 12px;
-  border-radius: 10px;
-  margin-top: 10px;
+  border-radius: 12px;
+  background: #fff1c4;
+  color: #5b4400;
+  margin-bottom: 10px;
+  font-weight: 600;
 }
+
+.summary-advice {
+  padding: 12px;
+  border-radius: 12px;
+  background: #d1ffd6;
+  color: #0a4b1d;
+  font-weight: 600;
+}
+
+.category-summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: var(--text);
+}
+
+/* =====================================================
+   HIDDEN
+===================================================== */
+
+.hidden { display: none; }
